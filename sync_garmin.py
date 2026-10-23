@@ -1,7 +1,9 @@
 import os
+import sys
 import json
 from datetime import datetime, timedelta, timezone
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 from garminconnect import Garmin
 
 # =====================================================================
@@ -86,6 +88,17 @@ def resolve_garmin_exercise_name(ex_set: dict) -> tuple[str, str]:
     return mapped_name, raw_name
 
 
+def clean_gist_id(raw_gist: str) -> str:
+    """
+    Accepts either a 32-char Gist ID or a full https://gist.github.com/user/id URL
+    and returns the clean Gist ID.
+    """
+    cleaned = raw_gist.strip().rstrip("/")
+    if "/" in cleaned:
+        cleaned = cleaned.split("/")[-1]
+    return cleaned
+
+
 def fetch_existing_gist(gist_id: str, github_token: str, filename: str) -> dict:
     url = f"https://api.github.com/gists/{gist_id}"
     req = Request(url, headers={
@@ -121,26 +134,58 @@ def update_gist(gist_id: str, github_token: str, filename: str, payload: dict):
         "Content-Type": "application/json",
         "User-Agent": "IronPulse-Garmin-Sync"
     })
-    with urlopen(req) as resp:
-        if resp.status not in (200, 201):
-            raise RuntimeError(f"GitHub Gist update failed with HTTP {resp.status}")
-    print("Successfully updated secret GitHub Gist with Garmin data.")
+    try:
+        with urlopen(req) as resp:
+            if resp.status not in (200, 201):
+                raise RuntimeError(f"GitHub Gist update failed with HTTP {resp.status}")
+        print("✅ Successfully updated secret GitHub Gist with Garmin data.")
+    except HTTPError as err:
+        err_body = err.read().decode("utf-8", errors="ignore")
+        print(f"❌ ERROR updating GitHub Gist (HTTP {err.code}): {err_body}")
+        print("-> Check that GIST_ID is valid and GH_GIST_TOKEN has 'gist' (Read/Write) scope.")
+        sys.exit(1)
 
 
 def main():
-    email = os.environ.get("GARMIN_EMAIL")
-    password = os.environ.get("GARMIN_PASSWORD")
-    gist_id = os.environ.get("GIST_ID")
-    github_token = os.environ.get("GH_GIST_TOKEN")
-    days_back = int(os.environ.get("SYNC_DAYS_BACK", "30"))
+    email = (os.environ.get("GARMIN_EMAIL") or "").strip()
+    password = (os.environ.get("GARMIN_PASSWORD") or "").strip()
+    raw_gist_id = (os.environ.get("GIST_ID") or "").strip()
+    github_token = (os.environ.get("GH_GIST_TOKEN") or "").strip()
+    days_back = int(os.environ.get("SYNC_DAYS_BACK") or "30")
     gist_filename = "ironpulse_garmin_sync.json"
 
-    if not all([email, password, gist_id, github_token]):
-        raise ValueError("Missing required environment variables: GARMIN_EMAIL, GARMIN_PASSWORD, GIST_ID, GH_GIST_TOKEN")
+    # 1. Explicitly check which GitHub Repository Secrets are present
+    missing_secrets = []
+    if not email:
+        missing_secrets.append("GARMIN_EMAIL")
+    if not password:
+        missing_secrets.append("GARMIN_PASSWORD")
+    if not raw_gist_id:
+        missing_secrets.append("GIST_ID")
+    if not github_token:
+        missing_secrets.append("GH_GIST_TOKEN")
 
+    if missing_secrets:
+        print("❌ ERROR: The following required GitHub Actions Secrets are empty or missing:")
+        for s in missing_secrets:
+            print(f"   - {s}")
+        print("\nFix: Go to your GitHub Repo -> Settings -> Secrets and variables -> Actions,")
+        print("and ensure all 4 secrets are added under 'Repository secrets' (not Environment secrets).")
+        sys.exit(1)
+
+    gist_id = clean_gist_id(raw_gist_id)
+    print(f"Configuration check passed (Gist ID length: {len(gist_id)} chars, Window: {days_back} days).")
+
+    # 2. Authenticate with Garmin Connect
     print("Authenticating with Garmin Connect...")
-    client = Garmin(email, password)
-    client.login()
+    try:
+        client = Garmin(email, password)
+        client.login()
+        print("✅ Authenticated with Garmin Connect successfully.")
+    except Exception as e:
+        print(f"❌ ERROR authenticating with Garmin Connect: {e}")
+        print("-> Verify GARMIN_EMAIL and GARMIN_PASSWORD in GitHub Secrets, and ensure 2FA/MFA is disabled on your Garmin account.")
+        sys.exit(1)
 
     today = datetime.now(timezone.utc).date()
     start_date = today - timedelta(days=days_back)
@@ -173,6 +218,9 @@ def main():
             print(f"Skipping activity {activity_id} (could not fetch exercise sets: {e})")
             continue
 
+        if not ex_sets_resp:
+            continue
+
         exercise_sets = ex_sets_resp.get("exerciseSets") or []
         active_set_idx = 0
 
@@ -196,7 +244,10 @@ def main():
             e1rm = calculate_epley_1rm(weight_kg, reps)
 
             set_id = f"garmin_{activity_id}_{active_set_idx}"
-            base_ts = int(datetime.fromisoformat(start_local).timestamp() * 1000) if len(start_local) >= 19 else int(datetime.now().timestamp() * 1000)
+            try:
+                base_ts = int(datetime.fromisoformat(start_local).timestamp() * 1000)
+            except Exception:
+                base_ts = int(datetime.now().timestamp() * 1000)
 
             sets_by_id[set_id] = {
                 "id": set_id,
@@ -220,7 +271,7 @@ def main():
     print(f"Fetching Garmin body composition from {start_date.isoformat()} to {today.isoformat()}...")
     try:
         body_comp = client.get_body_composition(start_date.isoformat(), today.isoformat())
-        weight_list = body_comp.get("dateWeightList") or []
+        weight_list = (body_comp or {}).get("dateWeightList") or []
         for entry in weight_list:
             cal_date = entry.get("calendarDate")
             weight_grams = entry.get("weight")
@@ -247,7 +298,7 @@ def main():
     }
 
     update_gist(gist_id, github_token, gist_filename, payload)
-    print(f"Sync complete! Total sets in Gist: {len(merged_sets)} (processed {new_sets_count} recent sets), Total weigh-ins: {len(merged_bw)}")
+    print(f"🎉 Sync complete! Total sets in Gist: {len(merged_sets)} (processed {new_sets_count} recent sets), Total weigh-ins: {len(merged_bw)}")
 
 
 if __name__ == "__main__":
