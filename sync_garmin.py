@@ -198,16 +198,68 @@ def main():
     bw_by_date = {b["date"]: b for b in existing_data.get("bodyweightLogs", []) if "date" in b}
 
     print(f"Fetching Garmin activities from {start_date.isoformat()} to {end_date.isoformat()}...")
-    # Note: Garmin Connect API rejects subtypes like 'strength_training' in the activitytype query param (HTTP 400)
-    # because 'strength_training' is a subtype under 'fitness_equipment'.
-    # Fetching all activities in the date range and filtering in Python avoids the 400 error reliably.
-    all_activities = client.get_activities_by_date(
-        start_date.isoformat(),
-        end_date.isoformat()
-    )
+    all_activities = client.get_activities_by_date(start_date.isoformat(), end_date.isoformat())
 
     activities = [
-# ... existing code ... -->
+        act for act in (all_activities or [])
+        if (act.get("activityType") or {}).get("typeKey") in ("strength_training", "fitness_equipment")
+    ]
+    print(f"Found {len(activities)} strength activities out of {len(all_activities or [])} total activities.")
+
+    new_sets_count = 0
+    for act in activities:
+        activity_id = act.get("activityId")
+        if not activity_id:
+            continue
+
+        start_local = act.get("startTimeLocal") or act.get("startTimeGMT") or ""
+        date_str = start_local[:10] if len(start_local) >= 10 else today.isoformat()
+        try:
+            base_ts = int(datetime.fromisoformat(start_local.replace(" ", "T")).timestamp() * 1000)
+        except Exception:
+            base_ts = int(datetime.now(timezone.utc).timestamp() * 1000)
+
+        try:
+            details = client.get_activity_exercise_sets(activity_id)
+        except Exception as e:
+            print(f"Skipping activity {activity_id}: could not fetch exercise sets ({e})")
+            continue
+
+        exercise_sets = (details or {}).get("exerciseSets") or []
+        active_index = 0
+
+        for ex_set in exercise_sets:
+            if ex_set.get("setType") != "ACTIVE":
+                continue
+
+            reps = int(ex_set.get("repetitionCount") or 0)
+            raw_weight_grams = float(ex_set.get("weight") or 0.0)
+            weight_kg = round(raw_weight_grams / 1000.0, 2) if raw_weight_grams > 0 else 0.0
+
+            if reps <= 0 and weight_kg <= 0:
+                continue
+
+            active_index += 1
+            mapped_name, raw_garmin_name = resolve_garmin_exercise_name(ex_set)
+            category = IRONPULSE_CATEGORIES.get(mapped_name, "Custom")
+            volume = round(weight_kg * reps, 1)
+            e1rm = calculate_epley_1rm(weight_kg, reps)
+
+            set_id = f"garmin_{activity_id}_{active_index}"
+            sets_by_id[set_id] = {
+                "id": set_id,
+                "garminActivityId": activity_id,
+                "timestamp": base_ts + (active_index * 60000),
+                "date": date_str,
+                "exercise": mapped_name,
+                "rawGarminExercise": raw_garmin_name,
+                "category": category,
+                "weight": weight_kg,
+                "reps": reps,
+                "notes": f"Garmin Sync ({raw_garmin_name})",
+                "volume": volume,
+                "e1rm": e1rm
+            }
             new_sets_count += 1
 
     print(f"Fetching Garmin body composition from {start_date.isoformat()} to {end_date.isoformat()}...")
