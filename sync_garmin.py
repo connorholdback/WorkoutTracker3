@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import traceback
 from datetime import datetime, timedelta, timezone
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
@@ -9,8 +10,6 @@ from garminconnect import Garmin
 # =====================================================================
 # 1. DEFAULT EXERCISE NAME MAPPING (GARMIN CATEGORY -> IRONPULSE LIFT)
 # =====================================================================
-# Garmin stores exercises as (category, subtype). You can customize these
-# or map any unmapped Garmin exercise directly inside the IronPulse UI!
 GARMIN_TO_IRONPULSE_MAP = {
     "INCLINE_BENCH_PRESS": "DB Incline BenchPress",
     "BARBELL_INCLINE_BENCH_PRESS": "BB Incline BenchPress",
@@ -71,10 +70,6 @@ def calculate_epley_1rm(weight: float, reps: int) -> float:
 
 
 def resolve_garmin_exercise_name(ex_set: dict) -> tuple[str, str]:
-    """
-    Extracts the raw Garmin exercise identifier from the `exercises` array inside a set message
-    and returns (mapped_ironpulse_name, raw_garmin_name).
-    """
     exercises_list = ex_set.get("exercises") or []
     raw_name = "UNKNOWN_EXERCISE"
 
@@ -89,10 +84,6 @@ def resolve_garmin_exercise_name(ex_set: dict) -> tuple[str, str]:
 
 
 def clean_gist_id(raw_gist: str) -> str:
-    """
-    Accepts either a 32-char Gist ID or a full https://gist.github.com/user/id URL
-    and returns the clean Gist ID.
-    """
     cleaned = raw_gist.strip().rstrip("/")
     if "/" in cleaned:
         cleaned = cleaned.split("/")[-1]
@@ -138,10 +129,10 @@ def update_gist(gist_id: str, github_token: str, filename: str, payload: dict):
         with urlopen(req) as resp:
             if resp.status not in (200, 201):
                 raise RuntimeError(f"GitHub Gist update failed with HTTP {resp.status}")
-        print("✅ Successfully updated secret GitHub Gist with Garmin data.")
+        print("Successfully updated secret GitHub Gist with Garmin data.")
     except HTTPError as err:
         err_body = err.read().decode("utf-8", errors="ignore")
-        print(f"❌ ERROR updating GitHub Gist (HTTP {err.code}): {err_body}")
+        print(f"ERROR updating GitHub Gist (HTTP {err.code}): {err_body}")
         print("-> Check that GIST_ID is valid and GH_GIST_TOKEN has 'gist' (Read/Write) scope.")
         sys.exit(1)
 
@@ -154,7 +145,6 @@ def main():
     days_back = int(os.environ.get("SYNC_DAYS_BACK") or "30")
     gist_filename = "ironpulse_garmin_sync.json"
 
-    # 1. Explicitly check which GitHub Repository Secrets are present
     missing_secrets = []
     if not email:
         missing_secrets.append("GARMIN_EMAIL")
@@ -166,7 +156,7 @@ def main():
         missing_secrets.append("GH_GIST_TOKEN")
 
     if missing_secrets:
-        print("❌ ERROR: The following required GitHub Actions Secrets are empty or missing:")
+        print("ERROR: The following required GitHub Actions Secrets are empty or missing:")
         for s in missing_secrets:
             print(f"   - {s}")
         print("\nFix: Go to your GitHub Repo -> Settings -> Secrets and variables -> Actions,")
@@ -176,35 +166,38 @@ def main():
     gist_id = clean_gist_id(raw_gist_id)
     print(f"Configuration check passed (Gist ID length: {len(gist_id)} chars, Window: {days_back} days).")
 
-    # 2. Authenticate with Garmin Connect
     print("Authenticating with Garmin Connect...")
     try:
         client = Garmin(email, password)
         client.login()
-        print("✅ Authenticated with Garmin Connect successfully.")
+        print("Authenticated with Garmin Connect successfully.")
     except Exception as e:
-        print(f"❌ ERROR authenticating with Garmin Connect: {e}")
+        print(f"ERROR authenticating with Garmin Connect: {e}")
+        traceback.print_exc()
         print("-> Verify GARMIN_EMAIL and GARMIN_PASSWORD in GitHub Secrets, and ensure 2FA/MFA is disabled on your Garmin account.")
         sys.exit(1)
 
     today = datetime.now(timezone.utc).date()
     start_date = today - timedelta(days=days_back)
 
-    # Load existing Gist payload so we merge cleanly without losing older synced records
     existing_data = fetch_existing_gist(gist_id, github_token, gist_filename)
     sets_by_id = {s["id"]: s for s in existing_data.get("workoutLogs", []) if "id" in s}
     bw_by_date = {b["date"]: b for b in existing_data.get("bodyweightLogs", []) if "date" in b}
 
-    # -----------------------------------------------------------------
-    # A. FETCH STRENGTH TRAINING ACTIVITIES & EXERCISE SETS
-    # -----------------------------------------------------------------
     print(f"Fetching Garmin activities since {start_date.isoformat()}...")
-    activities = client.get_activities_by_date(
+    # Note: Garmin Connect API rejects subtypes like 'strength_training' in the activitytype query param (HTTP 400)
+    # because 'strength_training' is a subtype under 'fitness_equipment'.
+    # Fetching all activities in the date range and filtering in Python avoids the 400 error reliably.
+    all_activities = client.get_activities_by_date(
         start_date.isoformat(),
-        today.isoformat(),
-        activitytype="strength_training"
+        today.isoformat()
     )
-    print(f"Found {len(activities)} strength_training activities.")
+
+    activities = [
+        act for act in (all_activities or [])
+        if (act.get("activityType") or {}).get("typeKey") in ("strength_training", "fitness_equipment")
+    ]
+    print(f"Found {len(activities)} strength_training activities (out of {len(all_activities or [])} total activities).")
 
     new_sets_count = 0
     for act in activities:
@@ -225,12 +218,10 @@ def main():
         active_set_idx = 0
 
         for s in exercise_sets:
-            # Skip rest intervals; only process ACTIVE lifting sets
             if s.get("setType") != "ACTIVE":
                 continue
 
             reps = int(s.get("repetitionCount") or 0)
-            # Garmin stores weight in grams inside .FIT set messages (e.g. 60000 = 60.0 kg)
             raw_weight_grams = float(s.get("weight") or 0.0)
             weight_kg = round(raw_weight_grams / 1000.0, 2) if raw_weight_grams > 0 else 0.0
 
@@ -265,9 +256,6 @@ def main():
             }
             new_sets_count += 1
 
-    # -----------------------------------------------------------------
-    # B. FETCH GARMIN BODYWEIGHT / INDEX SCALE WEIGH-INS
-    # -----------------------------------------------------------------
     print(f"Fetching Garmin body composition from {start_date.isoformat()} to {today.isoformat()}...")
     try:
         body_comp = client.get_body_composition(start_date.isoformat(), today.isoformat())
@@ -286,7 +274,6 @@ def main():
     except Exception as e:
         print(f"Warning: Could not fetch body composition ({e})")
 
-    # Sort logs chronologically
     merged_sets = sorted(sets_by_id.values(), key=lambda x: (x["date"], x["timestamp"]))
     merged_bw = sorted(bw_by_date.values(), key=lambda x: x["date"])
 
@@ -298,7 +285,7 @@ def main():
     }
 
     update_gist(gist_id, github_token, gist_filename, payload)
-    print(f"🎉 Sync complete! Total sets in Gist: {len(merged_sets)} (processed {new_sets_count} recent sets), Total weigh-ins: {len(merged_bw)}")
+    print(f"Sync complete! Total sets in Gist: {len(merged_sets)} (processed {new_sets_count} recent sets), Total weigh-ins: {len(merged_bw)}")
 
 
 if __name__ == "__main__":
