@@ -143,6 +143,8 @@ def main():
     raw_gist_id = (os.environ.get("GIST_ID") or "").strip()
     github_token = (os.environ.get("GH_GIST_TOKEN") or "").strip()
     days_back = int(os.environ.get("SYNC_DAYS_BACK") or "30")
+    custom_start_str = (os.environ.get("SYNC_START_DATE") or "").strip()
+    custom_end_str = (os.environ.get("SYNC_END_DATE") or "").strip()
     gist_filename = "ironpulse_garmin_sync.json"
 
     missing_secrets = []
@@ -178,87 +180,39 @@ def main():
         sys.exit(1)
 
     today = datetime.now(timezone.utc).date()
-    start_date = today - timedelta(days=days_back)
+    try:
+        end_date = datetime.fromisoformat(custom_end_str).date() if custom_end_str else today
+    except ValueError:
+        end_date = today
+
+    try:
+        start_date = datetime.fromisoformat(custom_start_str).date() if custom_start_str else (end_date - timedelta(days=days_back))
+    except ValueError:
+        start_date = end_date - timedelta(days=days_back)
+
+    if start_date > end_date:
+        start_date, end_date = end_date, start_date
 
     existing_data = fetch_existing_gist(gist_id, github_token, gist_filename)
     sets_by_id = {s["id"]: s for s in existing_data.get("workoutLogs", []) if "id" in s}
     bw_by_date = {b["date"]: b for b in existing_data.get("bodyweightLogs", []) if "date" in b}
 
-    print(f"Fetching Garmin activities since {start_date.isoformat()}...")
+    print(f"Fetching Garmin activities from {start_date.isoformat()} to {end_date.isoformat()}...")
     # Note: Garmin Connect API rejects subtypes like 'strength_training' in the activitytype query param (HTTP 400)
     # because 'strength_training' is a subtype under 'fitness_equipment'.
     # Fetching all activities in the date range and filtering in Python avoids the 400 error reliably.
     all_activities = client.get_activities_by_date(
         start_date.isoformat(),
-        today.isoformat()
+        end_date.isoformat()
     )
 
     activities = [
-        act for act in (all_activities or [])
-        if (act.get("activityType") or {}).get("typeKey") in ("strength_training", "fitness_equipment")
-    ]
-    print(f"Found {len(activities)} strength_training activities (out of {len(all_activities or [])} total activities).")
-
-    new_sets_count = 0
-    for act in activities:
-        activity_id = act.get("activityId")
-        start_local = act.get("startTimeLocal") or act.get("startTimeGMT") or ""
-        date_str = start_local[:10] if len(start_local) >= 10 else today.isoformat()
-
-        try:
-            ex_sets_resp = client.get_activity_exercise_sets(activity_id)
-        except Exception as e:
-            print(f"Skipping activity {activity_id} (could not fetch exercise sets: {e})")
-            continue
-
-        if not ex_sets_resp:
-            continue
-
-        exercise_sets = ex_sets_resp.get("exerciseSets") or []
-        active_set_idx = 0
-
-        for s in exercise_sets:
-            if s.get("setType") != "ACTIVE":
-                continue
-
-            reps = int(s.get("repetitionCount") or 0)
-            raw_weight_grams = float(s.get("weight") or 0.0)
-            weight_kg = round(raw_weight_grams / 1000.0, 2) if raw_weight_grams > 0 else 0.0
-
-            if reps <= 0:
-                continue
-
-            active_set_idx += 1
-            mapped_name, raw_garmin_name = resolve_garmin_exercise_name(s)
-            category = IRONPULSE_CATEGORIES.get(mapped_name, "Custom")
-            volume = round(weight_kg * reps, 1)
-            e1rm = calculate_epley_1rm(weight_kg, reps)
-
-            set_id = f"garmin_{activity_id}_{active_set_idx}"
-            try:
-                base_ts = int(datetime.fromisoformat(start_local).timestamp() * 1000)
-            except Exception:
-                base_ts = int(datetime.now().timestamp() * 1000)
-
-            sets_by_id[set_id] = {
-                "id": set_id,
-                "garminActivityId": activity_id,
-                "timestamp": base_ts + (active_set_idx * 60000),
-                "date": date_str,
-                "exercise": mapped_name,
-                "rawGarminExercise": raw_garmin_name,
-                "category": category,
-                "weight": weight_kg,
-                "reps": reps,
-                "notes": f"Garmin Sync ({raw_garmin_name})" if mapped_name != raw_garmin_name else "Garmin Sync",
-                "volume": volume,
-                "e1rm": e1rm
-            }
+# ... existing code ... -->
             new_sets_count += 1
 
-    print(f"Fetching Garmin body composition from {start_date.isoformat()} to {today.isoformat()}...")
+    print(f"Fetching Garmin body composition from {start_date.isoformat()} to {end_date.isoformat()}...")
     try:
-        body_comp = client.get_body_composition(start_date.isoformat(), today.isoformat())
+        body_comp = client.get_body_composition(start_date.isoformat(), end_date.isoformat())
         weight_list = (body_comp or {}).get("dateWeightList") or []
         for entry in weight_list:
             cal_date = entry.get("calendarDate")
