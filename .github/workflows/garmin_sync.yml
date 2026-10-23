@@ -1,0 +1,42 @@
+name: Garmin Connect to IronPulse Sync
+
+on:
+  # 1. Runs automatically every 6 hours
+  schedule:
+    - cron: '0 */6 * * *'
+
+  # 2. Allows one-tap manual trigger from GitHub UI or IronPulse PWA "Run Cloud Action" button
+  workflow_dispatch:
+    inputs:
+      days_back:
+        description: 'Number of past days to fetch from Garmin Connect'
+        required: false
+        default: '30'
+
+jobs:
+  sync-garmin-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install python-garminconnect
+        run: |
+          python -m pip install --upgrade pip
+          pip install garminconnect
+
+      - name: Run Garmin Sync Script
+        env:
+          GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+          GH_GIST_TOKEN: ${{ secrets.GH_GIST_TOKEN }}
+          SYNC_DAYS_BACK: ${{ github.event.inputs.days_back || '30' }}
+        run: python sync_garmin.py
