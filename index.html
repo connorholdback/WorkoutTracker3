@@ -776,6 +776,30 @@
                         </label>
                     </div>
 
+                    <!-- Garmin Import Date Range Filter -->
+                    <div class="pt-2.5 border-t border-gray-800/80 space-y-2">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Import Date Range</span>
+                            <div class="flex bg-surface-950 p-1 rounded-xl border border-gray-800 gap-1">
+                                <button type="button" id="garmin-range-btn-7d" onclick="setGarminImportPreset('7d')" class="px-2 py-0.5 rounded-lg text-[10px] font-bold text-gray-400 hover:text-white transition">7D</button>
+                                <button type="button" id="garmin-range-btn-30d" onclick="setGarminImportPreset('30d')" class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-sky-500 text-surface-950 transition">30D</button>
+                                <button type="button" id="garmin-range-btn-90d" onclick="setGarminImportPreset('90d')" class="px-2 py-0.5 rounded-lg text-[10px] font-bold text-gray-400 hover:text-white transition">90D</button>
+                                <button type="button" id="garmin-range-btn-365d" onclick="setGarminImportPreset('365d')" class="px-2 py-0.5 rounded-lg text-[10px] font-bold text-gray-400 hover:text-white transition">1Y</button>
+                                <button type="button" id="garmin-range-btn-all" onclick="setGarminImportPreset('all')" class="px-2 py-0.5 rounded-lg text-[10px] font-bold text-gray-400 hover:text-white transition">All</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[9px] font-bold uppercase text-gray-500 mb-0.5">From Date</label>
+                                <input type="date" id="garmin-sync-start-date" onchange="onGarminSyncDateChange()" class="w-full bg-surface-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-sky-400">
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-bold uppercase text-gray-500 mb-0.5">To Date</label>
+                                <input type="date" id="garmin-sync-end-date" onchange="onGarminSyncDateChange()" class="w-full bg-surface-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-sky-400">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-2 pt-1">
                         <button type="button" onclick="syncFromGarminGist(false)" class="py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-surface-950 font-extrabold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5 shadow-lg shadow-sky-500/20">
                             <i class="fa-solid fa-cloud-arrow-down"></i> Sync Garmin Now
@@ -857,11 +881,18 @@
                     <h3 class="font-extrabold text-base text-white flex items-center gap-2">
                         <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Garmin Lift Name Mapper
                     </h3>
-                    <p class="text-[11px] text-gray-400 mt-0.5">Map Garmin watch exercise labels to your exact IronPulse lifts</p>
+                    <p id="garmin-mapper-subtitle" class="text-[11px] text-gray-400 mt-0.5">Map Garmin watch exercise labels to your exact IronPulse lifts</p>
                 </div>
                 <button type="button" onclick="closeGarminMapperModal()" class="text-gray-400 hover:text-white">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
+            </div>
+
+            <div id="garmin-unmapped-alert" class="hidden p-3 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs space-y-1">
+                <div class="font-extrabold flex items-center gap-1.5 text-amber-300">
+                    <i class="fa-solid fa-bell"></i> New Garmin Exercises Detected!
+                </div>
+                <p class="text-[11px] text-gray-300 leading-relaxed">Select which IronPulse lift each new Garmin tag should map to (or choose <strong>+ Create as Custom Lift</strong>), then tap <strong>Save & Import</strong>.</p>
             </div>
 
             <div id="garmin-mapper-list" class="flex-1 overflow-y-auto space-y-2 pr-1">
@@ -872,7 +903,7 @@
                 <button type="button" onclick="resetGarminMapToDefault()" class="px-3 py-2 rounded-xl bg-surface-800 hover:bg-gray-700 text-gray-300 font-bold text-xs">
                     Reset Defaults
                 </button>
-                <button type="button" onclick="closeGarminMapperModal()" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-surface-950 font-extrabold text-xs">
+                <button type="button" id="garmin-mapper-done-btn" onclick="closeGarminMapperModal()" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-surface-950 font-extrabold text-xs">
                     Done & Re-Apply
                 </button>
             </div>
@@ -1037,13 +1068,13 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <p class="text-xs text-gray-300 leading-relaxed">Choose whether to clear only your logged workout sets & weigh-ins (keeping your custom exercises, primary/secondary muscle mappings, and volume tier settings) or wipe everything back to factory defaults.</p>
+            <p class="text-xs text-gray-300 leading-relaxed">Choose whether to clear only your logged workout sets & weigh-ins or clear all workouts & custom exercise muscle configs. <strong>Note:</strong> Your Garmin Lift Mapper and Volume Color Tiers are never wiped by either option.</p>
             <div class="flex flex-col gap-2 pt-1">
                 <button type="button" onclick="confirmClearExerciseDataOnly()" class="w-full py-2.5 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-extrabold text-xs transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-eraser"></i> Clear Exercise Data Only (Keep Configs)
                 </button>
                 <button type="button" onclick="confirmClearAllData()" class="w-full py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-trash-can"></i> Clear All (Reset Everything)
+                    <i class="fa-solid fa-trash-can"></i> Clear All (Keep Mapper & Color Tiers)
                 </button>
                 <button type="button" onclick="closeConfirmClearModal()" class="w-full py-2 rounded-xl bg-surface-800 hover:bg-gray-700 text-gray-300 font-bold text-xs transition">
                     Cancel
@@ -1172,8 +1203,18 @@
         let exercises = [];
         let bodyweightLogs = [];
         let heatTierThresholds = { ...DEFAULT_HEAT_TIERS };
-        let garminConfig = { gistId: '', ghToken: '', ghRepo: '', autoSync: true, lastSyncedAt: null };
+        let garminConfig = {
+            gistId: '',
+            ghToken: '',
+            ghRepo: '',
+            autoSync: true,
+            lastSyncedAt: null,
+            syncPreset: '30d',
+            syncStartDate: '',
+            syncEndDate: ''
+        };
         let garminExerciseMap = { ...DEFAULT_GARMIN_EXERCISE_MAP };
+        let pendingGarminImport = null; // Holds sets & weigh-ins waiting on new exercise mappings
         let currentChartMode = 'combined'; // 'combined', '1rm', or 'volume'
         let analyticsDatePreset = '12m';   // '12w', '12m', 'all', or 'custom'
         let analyticsInterval = 'weekly';  // 'weekly' or 'monthly'
@@ -1383,9 +1424,444 @@
             if (repoInput) repoInput.value = garminConfig.ghRepo || '';
             if (autoToggle) autoToggle.checked = garminConfig.autoSync !== false;
 
+            const todayStr = getLocalTodayDateString();
+            if (!garminConfig.syncEndDate) {
+                garminConfig.syncEndDate = todayStr;
+            }
+            if (!garminConfig.syncStartDate) {
+                const start = new Date();
+                start.setDate(start.getDate() - 30);
+                garminConfig.syncStartDate = formatLocalDate(start);
+                garminConfig.syncPreset = '30d';
+            }
+
+            const startEl = document.getElementById('garmin-sync-start-date');
+            const endEl = document.getElementById('garmin-sync-end-date');
+            if (startEl) startEl.value = garminConfig.syncStartDate;
+            if (endEl) endEl.value = garminConfig.syncEndDate;
+            updateGarminImportPresetButtonsUI();
+
             if (statusLabel && garminConfig.lastSyncedAt) {
                 const dt = new Date(garminConfig.lastSyncedAt);
                 statusLabel.textContent = `Last synced: ${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+            }
+        }
+
+        function setGarminImportPreset(preset) {
+            garminConfig.syncPreset = preset;
+            const today = new Date();
+            const endStr = formatLocalDate(today);
+            let startStr = '2000-01-01';
+
+            const daysMap = { '7d': 7, '30d': 30, '90d': 90, '365d': 365 };
+            if (daysMap[preset]) {
+                const start = new Date(today.getTime() - daysMap[preset] * 86400000);
+                startStr = formatLocalDate(start);
+            }
+
+            garminConfig.syncStartDate = startStr;
+            garminConfig.syncEndDate = endStr;
+
+            const startEl = document.getElementById('garmin-sync-start-date');
+            const endEl = document.getElementById('garmin-sync-end-date');
+            if (startEl) startEl.value = startStr;
+            if (endEl) endEl.value = endStr;
+
+            updateGarminImportPresetButtonsUI();
+            saveGarminSyncSettings();
+        }
+
+        function onGarminSyncDateChange() {
+            garminConfig.syncPreset = 'custom';
+            updateGarminImportPresetButtonsUI();
+            saveGarminSyncSettings();
+        }
+
+        function updateGarminImportPresetButtonsUI() {
+            const presets = ['7d', '30d', '90d', '365d', 'all'];
+            presets.forEach(p => {
+                const btn = document.getElementById(`garmin-range-btn-${p}`);
+                if (!btn) return;
+                if (garminConfig.syncPreset === p) {
+                    btn.className = 'px-2 py-0.5 rounded-lg text-[10px] font-bold bg-sky-500 text-surface-950 transition';
+                } else {
+                    btn.className = 'px-2 py-0.5 rounded-lg text-[10px] font-bold text-gray-400 hover:text-white transition';
+                }
+            });
+        }
+
+        function saveGarminSyncSettings() {
+            const gistVal = (document.getElementById('garmin-gist-id')?.value || '').trim();
+            const tokenVal = (document.getElementById('garmin-gh-token')?.value || '').trim();
+            const repoVal = (document.getElementById('garmin-gh-repo')?.value || '').trim();
+            const autoVal = document.getElementById('garmin-autosync-toggle')?.checked ?? true;
+            const startVal = document.getElementById('garmin-sync-start-date')?.value || garminConfig.syncStartDate || '';
+            const endVal = document.getElementById('garmin-sync-end-date')?.value || garminConfig.syncEndDate || '';
+
+            garminConfig.gistId = gistVal;
+            garminConfig.ghToken = tokenVal;
+            garminConfig.ghRepo = repoVal;
+            garminConfig.autoSync = autoVal;
+            garminConfig.syncStartDate = startVal;
+            garminConfig.syncEndDate = endVal;
+            saveToLocalStorage();
+        }
+
+        function triggerGarminSyncFromHeader() {
+            if (!garminConfig.gistId) {
+                switchTab('history');
+                showToast('Enter your Garmin Gist ID in History & Data to enable sync', true);
+                document.getElementById('garmin-gist-id')?.focus();
+                return;
+            }
+            syncFromGarminGist(false);
+        }
+
+        function isGarminTagKnown(rawTag) {
+            if (Object.prototype.hasOwnProperty.call(garminExerciseMap, rawTag)) {
+                return true;
+            }
+            if (exercises.some(e => e.name === rawTag)) {
+                return true;
+            }
+            return false;
+        }
+
+        async function syncFromGarminGist(isSilentStartup = false) {
+            saveGarminSyncSettings();
+            const rawGistInput = garminConfig.gistId;
+            if (!rawGistInput) {
+                if (!isSilentStartup) showToast('Please enter your Secret Gist ID or Raw URL first', true);
+                return;
+            }
+
+            const headerIcon = document.getElementById('header-garmin-icon');
+            if (headerIcon) headerIcon.classList.add('fa-spin');
+
+            try {
+                let payload = null;
+                const headers = { 'Accept': 'application/vnd.github+json' };
+                if (garminConfig.ghToken) {
+                    headers['Authorization'] = `Bearer ${garminConfig.ghToken}`;
+                }
+
+                // Support either full raw URL or Gist ID
+                if (rawGistInput.startsWith('http://') || rawGistInput.startsWith('https://')) {
+                    const resp = await fetch(`${rawGistInput}${rawGistInput.includes('?') ? '&' : '?'}t=${Date.now()}`);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    payload = await resp.json();
+                } else {
+                    const cleanGistId = rawGistInput.split('/').pop().trim();
+                    const resp = await fetch(`https://api.github.com/gists/${cleanGistId}?t=${Date.now()}`, { headers });
+                    if (!resp.ok) throw new Error(`Gist API HTTP ${resp.status}`);
+                    const gistData = await resp.json();
+                    const files = gistData.files || {};
+                    const targetFile = files['ironpulse_garmin_sync.json'] || Object.values(files)[0];
+                    if (!targetFile || !targetFile.content) {
+                        throw new Error('ironpulse_garmin_sync.json not found in Gist');
+                    }
+                    payload = JSON.parse(targetFile.content);
+                }
+
+                // Filter incoming sets & weigh-ins by the user's selected Garmin Import Date Range
+                const rawStart = garminConfig.syncStartDate || '1970-01-01';
+                const rawEnd = garminConfig.syncEndDate || '2099-12-31';
+                const filterStart = rawStart <= rawEnd ? rawStart : rawEnd;
+                const filterEnd = rawEnd >= rawStart ? rawEnd : rawStart;
+
+                const allIncomingSets = Array.isArray(payload.workoutLogs) ? payload.workoutLogs : [];
+                const allIncomingBw = Array.isArray(payload.bodyweightLogs) ? payload.bodyweightLogs : [];
+
+                const incomingSets = allIncomingSets.filter(s => {
+                    const d = s.date || '';
+                    return d >= filterStart && d <= filterEnd;
+                });
+                const incomingBw = allIncomingBw.filter(b => {
+                    const d = b.date || '';
+                    return d >= filterStart && d <= filterEnd;
+                });
+
+                // Detect any unseen Garmin exercise tags before importing
+                const unknownTagsSet = new Set();
+                incomingSets.forEach(rawSet => {
+                    const rawTag = rawSet.rawGarminExercise || rawSet.exercise || 'UNKNOWN_EXERCISE';
+                    if (!isGarminTagKnown(rawTag)) {
+                        unknownTagsSet.add(rawTag);
+                    }
+                });
+
+                if (unknownTagsSet.size > 0) {
+                    const unmappedTags = Array.from(unknownTagsSet);
+                    pendingGarminImport = {
+                        incomingSets,
+                        incomingBw,
+                        lastSyncedAt: payload.lastSyncedAt || new Date().toISOString(),
+                        unmappedTags
+                    };
+                    openGarminMapperModal(unmappedTags);
+                    showToast(`${unmappedTags.length} new Garmin exercise(s) found — please map them to import`);
+                    return;
+                }
+
+                finalizeGarminDataImport(incomingSets, incomingBw, payload.lastSyncedAt, isSilentStartup);
+            } catch (err) {
+                console.error('Garmin Gist Sync Error:', err);
+                if (!isSilentStartup) {
+                    showToast(`Garmin Sync failed: ${err.message}`, true);
+                }
+            } finally {
+                if (headerIcon) headerIcon.classList.remove('fa-spin');
+            }
+        }
+
+        function finalizeGarminDataImport(incomingSets, incomingBw, syncedTimestamp, isSilentStartup = false) {
+            const existingIds = new Set(workoutLogs.map(s => s.id));
+            let addedSets = 0;
+            let updatedSets = 0;
+
+            incomingSets.forEach(rawSet => {
+                const rawTag = rawSet.rawGarminExercise || rawSet.exercise || 'UNKNOWN_EXERCISE';
+                const mappedExName = garminExerciseMap[rawTag] || rawSet.exercise || rawTag;
+
+                // Ensure the mapped target exercise exists in the library
+                if (!exercises.some(e => e.name === mappedExName)) {
+                    exercises.push({
+                        name: mappedExName,
+                        category: rawSet.category || 'Custom',
+                        laterality: 'bilateral',
+                        primaryMuscle: 'Chest',
+                        primaryMuscle2: '',
+                        secondaryMuscles: []
+                    });
+                }
+
+                const exObj = exercises.find(e => e.name === mappedExName);
+                const weight = parseFloat(rawSet.weight) || 0;
+                const reps = parseInt(rawSet.reps, 10) || 0;
+                const normalizedSet = {
+                    id: rawSet.id || `garmin_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                    garminActivityId: rawSet.garminActivityId || null,
+                    timestamp: rawSet.timestamp || Date.now(),
+                    date: rawSet.date || getLocalTodayDateString(),
+                    exercise: mappedExName,
+                    rawGarminExercise: rawTag,
+                    category: exObj ? exObj.category : (rawSet.category || 'Custom'),
+                    weight,
+                    reps,
+                    notes: rawSet.notes || `Garmin Sync (${rawTag})`,
+                    volume: calculateSetVolume(weight, reps),
+                    e1rm: calculateEpley1RM(weight, reps)
+                };
+
+                if (existingIds.has(normalizedSet.id)) {
+                    const idx = workoutLogs.findIndex(s => s.id === normalizedSet.id);
+                    if (idx !== -1) {
+                        workoutLogs[idx] = normalizedSet;
+                        updatedSets++;
+                    }
+                } else {
+                    workoutLogs.push(normalizedSet);
+                    existingIds.add(normalizedSet.id);
+                    addedSets++;
+                }
+            });
+
+            let addedBw = 0;
+            incomingBw.forEach(bwEntry => {
+                if (!bwEntry.date || !bwEntry.weight) return;
+                const existingBwIdx = bodyweightLogs.findIndex(b => b.date === bwEntry.date);
+                if (existingBwIdx === -1) {
+                    bodyweightLogs.push({
+                        id: bwEntry.id || `garmin_bw_${bwEntry.date}`,
+                        timestamp: bwEntry.timestamp || Date.now(),
+                        date: bwEntry.date,
+                        weight: +parseFloat(bwEntry.weight).toFixed(1)
+                    });
+                    addedBw++;
+                }
+            });
+
+            garminConfig.lastSyncedAt = syncedTimestamp || new Date().toISOString();
+            saveToLocalStorage();
+            populateExerciseSelect();
+            populateGarminSyncInputsUI();
+            onDateOrExerciseChange();
+            renderStatusPage();
+            if (!document.getElementById('tab-analytics').classList.contains('hidden')) renderAnalytics();
+            if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistoryList();
+
+            const headerStatus = document.getElementById('header-status');
+            if (headerStatus) {
+                headerStatus.textContent = `Garmin Synced • ${workoutLogs.length} sets`;
+            }
+
+            if (!isSilentStartup || addedSets > 0 || addedBw > 0) {
+                showToast(`Garmin Sync: +${addedSets} new sets (${updatedSets} updated), +${addedBw} weigh-ins`);
+            }
+        }
+
+        async function triggerGitHubWorkflowAndSync() {
+            saveGarminSyncSettings();
+            if (!garminConfig.ghToken || !garminConfig.ghRepo) {
+                showToast('Enter GitHub PAT & Repo (owner/repo) under Optional settings first', true);
+                return;
+            }
+            try {
+                // Calculate days_back needed to cover the user's selected Start Date
+                const startStr = garminConfig.syncStartDate || getLocalTodayDateString();
+                const endStr = garminConfig.syncEndDate || getLocalTodayDateString();
+                const [sy, sm, sd] = startStr.split('-').map(Number);
+                const startObj = new Date(sy, sm - 1, sd);
+                const diffDays = Math.max(7, Math.ceil((Date.now() - startObj.getTime()) / 86400000) + 1);
+
+                showToast(`Triggering Garmin Cloud Action (${startStr} to ${endStr})...`);
+                const url = `https://api.github.com/repos/${garminConfig.ghRepo}/actions/workflows/garmin_sync.yml/dispatches`;
+                const resp = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${garminConfig.ghToken}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ref: 'main',
+                        inputs: {
+                            days_back: String(diffDays),
+                            start_date: startStr,
+                            end_date: endStr
+                        }
+                    })
+                });
+                if (!resp.ok) {
+                    throw new Error(`GitHub API HTTP ${resp.status}`);
+                }
+                showToast('Cloud Action started! Pulling latest Gist in 15s...');
+                setTimeout(() => syncFromGarminGist(false), 15000);
+            } catch (err) {
+                showToast(`Workflow trigger error: ${err.message}`, true);
+            }
+        }
+
+        function openGarminMapperModal(highlightNewTags = []) {
+            const container = document.getElementById('garmin-mapper-list');
+            const alertBox = document.getElementById('garmin-unmapped-alert');
+            const doneBtn = document.getElementById('garmin-mapper-done-btn');
+
+            const newTagsSet = new Set(Array.isArray(highlightNewTags) ? highlightNewTags : []);
+            if (newTagsSet.size > 0) {
+                alertBox?.classList.remove('hidden');
+                if (doneBtn) doneBtn.textContent = 'Save & Import Sets';
+            } else {
+                alertBox?.classList.add('hidden');
+                if (doneBtn) doneBtn.textContent = 'Done & Re-Apply';
+            }
+
+            // Collect all raw Garmin exercise tags seen in logs + default map keys + any new unmapped tags
+            const rawTagsSet = new Set(Object.keys(DEFAULT_GARMIN_EXERCISE_MAP));
+            Object.keys(garminExerciseMap).forEach(k => rawTagsSet.add(k));
+            workoutLogs.forEach(s => {
+                if (s.rawGarminExercise) rawTagsSet.add(s.rawGarminExercise);
+            });
+            newTagsSet.forEach(t => rawTagsSet.add(t));
+
+            // Sort so newly detected unmapped tags appear right at the top
+            const sortedTags = Array.from(rawTagsSet).sort((a, b) => {
+                const aIsNew = newTagsSet.has(a) ? 0 : 1;
+                const bIsNew = newTagsSet.has(b) ? 0 : 1;
+                if (aIsNew !== bIsNew) return aIsNew - bIsNew;
+                return a.localeCompare(b);
+            });
+
+            container.innerHTML = sortedTags.map(tag => {
+                const isNew = newTagsSet.has(tag);
+                const currentTarget = garminExerciseMap[tag] || (exercises[0] ? exercises[0].name : tag);
+                const isCustomNewOption = currentTarget === `__CREATE_CUSTOM__:${tag}`;
+
+                const exerciseOptionsHtml = exercises.map(ex =>
+                    `<option value="${escapeHtml(ex.name)}" ${ex.name === currentTarget ? 'selected' : ''}>${escapeHtml(ex.name)}</option>`
+                ).join('') + `<option value="__CREATE_CUSTOM__:${escapeHtml(tag)}" ${isCustomNewOption ? 'selected' : ''}>+ Create Custom Lift ("${escapeHtml(tag)}")</option>`;
+
+                return `
+                    <div class="p-2.5 rounded-xl bg-surface-950 border ${isNew ? 'border-amber-400/80 ring-1 ring-amber-400/30' : 'border-gray-800'} flex items-center justify-between gap-2 text-xs">
+                        <div class="truncate">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-mono font-bold ${isNew ? 'text-amber-300' : 'text-sky-400'} truncate">${escapeHtml(tag)}</span>
+                                ${isNew ? '<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[9px] font-extrabold uppercase">New</span>' : ''}
+                            </div>
+                            <span class="text-[10px] text-gray-500">Garmin Watch Tag</span>
+                        </div>
+                        <select data-garmin-tag="${escapeHtml(tag)}" onchange="updateGarminTagMapping(this.getAttribute('data-garmin-tag'), this.value)" class="bg-surface-900 border ${isNew ? 'border-amber-500/50' : 'border-gray-700'} rounded-lg px-2 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-400 max-w-[185px]">
+                            ${exerciseOptionsHtml}
+                        </select>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('garmin-mapper-modal').classList.remove('hidden');
+        }
+
+        function resolveGarminCustomLiftSelection(rawGarminTag, selectedValue) {
+            if (selectedValue && selectedValue.startsWith('__CREATE_CUSTOM__:')) {
+                const customName = rawGarminTag;
+                if (!exercises.some(e => e.name === customName)) {
+                    exercises.push({
+                        name: customName,
+                        category: 'Custom',
+                        laterality: 'bilateral',
+                        primaryMuscle: 'Chest',
+                        primaryMuscle2: '',
+                        secondaryMuscles: []
+                    });
+                }
+                return customName;
+            }
+            return selectedValue;
+        }
+
+        function updateGarminTagMapping(rawGarminTag, targetExerciseName) {
+            const resolvedTarget = resolveGarminCustomLiftSelection(rawGarminTag, targetExerciseName);
+            garminExerciseMap[rawGarminTag] = resolvedTarget;
+            const exObj = exercises.find(e => e.name === resolvedTarget);
+            // Retroactively update any previously synced Garmin sets with this raw tag
+            workoutLogs.forEach(s => {
+                if (s.rawGarminExercise === rawGarminTag) {
+                    s.exercise = resolvedTarget;
+                    if (exObj) s.category = exObj.category;
+                }
+            });
+            saveToLocalStorage();
+            renderStatusPage();
+            onDateOrExerciseChange();
+        }
+
+        function resetGarminMapToDefault() {
+            garminExerciseMap = { ...DEFAULT_GARMIN_EXERCISE_MAP };
+            saveToLocalStorage();
+            openGarminMapperModal(pendingGarminImport ? pendingGarminImport.unmappedTags : []);
+            showToast('Restored default Garmin exercise mappings');
+        }
+
+        function closeGarminMapperModal() {
+            // Save any selections currently shown in the modal dropdowns (important for newly detected tags)
+            const selects = document.querySelectorAll('#garmin-mapper-list select[data-garmin-tag]');
+            selects.forEach(sel => {
+                const tag = sel.getAttribute('data-garmin-tag');
+                if (tag && sel.value) {
+                    const resolved = resolveGarminCustomLiftSelection(tag, sel.value);
+                    garminExerciseMap[tag] = resolved;
+                }
+            });
+
+            document.getElementById('garmin-mapper-modal').classList.add('hidden');
+
+            if (pendingGarminImport) {
+                const { incomingSets, incomingBw, lastSyncedAt } = pendingGarminImport;
+                pendingGarminImport = null;
+                finalizeGarminDataImport(incomingSets, incomingBw, lastSyncedAt, false);
+            } else {
+                saveToLocalStorage();
+                renderStatusPage();
+                if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistoryList();
             }
         }
 
@@ -3823,15 +4299,15 @@
             workoutLogs = [];
             bodyweightLogs = [];
             exercises = JSON.parse(JSON.stringify(DEFAULT_EXERCISES));
-            heatTierThresholds = { ...DEFAULT_HEAT_TIERS };
-            garminExerciseMap = { ...DEFAULT_GARMIN_EXERCISE_MAP };
+            // Note: heatTierThresholds and garminExerciseMap are intentionally preserved
+            // and never wiped when clearing all data.
             saveToLocalStorage();
             populateExerciseSelect();
             onDateOrExerciseChange();
             renderStatusPage();
             renderHistoryList();
             closeConfirmClearModal();
-            showToast('All workout data & configurations reset to defaults');
+            showToast('Cleared workouts & custom lifts (kept Lift Mapper & Volume Tiers)');
         }
 
         /**************************************************************
