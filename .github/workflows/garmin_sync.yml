@@ -15,22 +15,22 @@ on:
 
 jobs:
   sync-garmin-data:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install python-garminconnect
         run: |
           python -m pip install --upgrade pip
-          pip install garminconnect
+          pip install --upgrade garminconnect garth
 
       - name: Run Garmin Sync Script
         env:
@@ -39,4 +39,4 @@ jobs:
           GIST_ID: ${{ secrets.GIST_ID }}
           GH_GIST_TOKEN: ${{ secrets.GH_GIST_TOKEN }}
           SYNC_DAYS_BACK: ${{ github.event.inputs.days_back || '30' }}
-        run: python sync_garmin.py
+        run: python -u sync_garmin.py
