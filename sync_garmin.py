@@ -112,6 +112,8 @@ def extract_sleep_and_hrv_for_date(client: Garmin, date_str: str) -> dict:
     sleep_hours = None
     resting_hr = None
     hrv_ms = None
+    steps_count = None
+    active_kcal = None
 
     # 1. Fetch Sleep Duration & Resting HR from Garmin Sleep Data
     try:
@@ -153,10 +155,25 @@ def extract_sleep_and_hrv_for_date(client: Garmin, date_str: str) -> dict:
         except Exception:
             pass
 
+    # 4. Fetch Daily Steps & Active Calories Burned from User Summary
+    try:
+        user_summary = client.get_user_summary(date_str) or {}
+        raw_steps = user_summary.get("totalSteps")
+        if raw_steps is not None and int(raw_steps) >= 0:
+            steps_count = int(raw_steps)
+
+        raw_active_kcal = user_summary.get("activeKilocalories")
+        if raw_active_kcal is not None and float(raw_active_kcal) >= 0:
+            active_kcal = int(round(float(raw_active_kcal)))
+    except Exception:
+        pass
+
     return {
         "sleepHours": sleep_hours,
         "restingHR": resting_hr,
-        "hrv": hrv_ms
+        "hrv": hrv_ms,
+        "steps": steps_count,
+        "activeCalories": active_kcal
     }
 
 
@@ -315,13 +332,13 @@ def main():
     except Exception as e:
         print(f"Warning: Could not fetch body composition ({e})")
 
-    print(f"Fetching Garmin sleep, resting HR & HRV from {start_date.isoformat()} to {end_date.isoformat()}...")
+    print(f"Fetching Garmin sleep, resting HR, HRV, steps & active calories from {start_date.isoformat()} to {end_date.isoformat()}...")
     cur_date = start_date
     recovery_days_count = 0
     while cur_date <= end_date:
         d_str = cur_date.isoformat()
         metrics = extract_sleep_and_hrv_for_date(client, d_str)
-        if metrics["sleepHours"] is not None or metrics["restingHR"] is not None or metrics["hrv"] is not None:
+        if any(metrics[k] is not None for k in ("sleepHours", "restingHR", "hrv", "steps", "activeCalories")):
             existing_rec = recovery_by_date.get(d_str, {})
             recovery_by_date[d_str] = {
                 "id": f"garmin_rec_{d_str}",
@@ -329,7 +346,9 @@ def main():
                 "date": d_str,
                 "sleepHours": metrics["sleepHours"] if metrics["sleepHours"] is not None else existing_rec.get("sleepHours"),
                 "restingHR": metrics["restingHR"] if metrics["restingHR"] is not None else existing_rec.get("restingHR"),
-                "hrv": metrics["hrv"] if metrics["hrv"] is not None else existing_rec.get("hrv")
+                "hrv": metrics["hrv"] if metrics["hrv"] is not None else existing_rec.get("hrv"),
+                "steps": metrics["steps"] if metrics["steps"] is not None else existing_rec.get("steps"),
+                "activeCalories": metrics["activeCalories"] if metrics["activeCalories"] is not None else existing_rec.get("activeCalories")
             }
             recovery_days_count += 1
         cur_date += timedelta(days=1)
