@@ -133,7 +133,6 @@ def update_gist(gist_id: str, github_token: str, filename: str, payload: dict):
     except HTTPError as err:
         err_body = err.read().decode("utf-8", errors="ignore")
         print(f"ERROR updating GitHub Gist (HTTP {err.code}): {err_body}")
-        print("-> Check that GIST_ID is valid and GH_GIST_TOKEN has 'gist' (Read/Write) scope.")
         sys.exit(1)
 
 
@@ -147,36 +146,19 @@ def main():
     custom_end_str = (os.environ.get("SYNC_END_DATE") or "").strip()
     gist_filename = "ironpulse_garmin_sync.json"
 
-    missing_secrets = []
-    if not email:
-        missing_secrets.append("GARMIN_EMAIL")
-    if not password:
-        missing_secrets.append("GARMIN_PASSWORD")
-    if not raw_gist_id:
-        missing_secrets.append("GIST_ID")
-    if not github_token:
-        missing_secrets.append("GH_GIST_TOKEN")
-
-    if missing_secrets:
-        print("ERROR: The following required GitHub Actions Secrets are empty or missing:")
-        for s in missing_secrets:
-            print(f"   - {s}")
-        print("\nFix: Go to your GitHub Repo -> Settings -> Secrets and variables -> Actions,")
-        print("and ensure all 4 secrets are added under 'Repository secrets' (not Environment secrets).")
+    if not email or not password or not raw_gist_id or not github_token:
+        print("ERROR: Missing required GitHub Actions Secrets (GARMIN_EMAIL, GARMIN_PASSWORD, GIST_ID, GH_GIST_TOKEN).")
         sys.exit(1)
 
     gist_id = clean_gist_id(raw_gist_id)
-    print(f"Configuration check passed (Gist ID length: {len(gist_id)} chars, Window: {days_back} days).")
 
     print("Authenticating with Garmin Connect...")
     try:
         client = Garmin(email, password)
         client.login()
-        print("Authenticated with Garmin Connect successfully.")
     except Exception as e:
         print(f"ERROR authenticating with Garmin Connect: {e}")
         traceback.print_exc()
-        print("-> Verify GARMIN_EMAIL and GARMIN_PASSWORD in GitHub Secrets, and ensure 2FA/MFA is disabled on your Garmin account.")
         sys.exit(1)
 
     today = datetime.now(timezone.utc).date()
