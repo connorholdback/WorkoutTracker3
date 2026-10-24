@@ -105,7 +105,59 @@ def fetch_existing_gist(gist_id: str, github_token: str, filename: str) -> dict:
                 return json.loads(files[filename]["content"])
     except Exception as e:
         print(f"Note: Could not read existing gist content ({e}). Starting fresh payload.")
-    return {"workoutLogs": [], "bodyweightLogs": []}
+    return {"workoutLogs": [], "bodyweightLogs": [], "recoveryLogs": []}
+
+
+def extract_sleep_and_hrv_for_date(client: Garmin, date_str: str) -> dict:
+    sleep_hours = None
+    resting_hr = None
+    hrv_ms = None
+
+    # 1. Fetch Sleep Duration & Resting HR from Garmin Sleep Data
+    try:
+        sleep_data = client.get_sleep_data(date_str) or {}
+        daily_dto = sleep_data.get("dailySleepDTO") or {}
+        sleep_sec = daily_dto.get("sleepTimeSeconds")
+        if sleep_sec and float(sleep_sec) > 0:
+            sleep_hours = round(float(sleep_sec) / 3600.0, 2)
+
+        rhr_val = sleep_data.get("restingHeartRate") or daily_dto.get("restingHeartRate") or daily_dto.get("avgHeartRate")
+        if rhr_val and float(rhr_val) > 0:
+            resting_hr = round(float(rhr_val), 1)
+
+        # Garmin often includes average overnight HRV directly on sleep_data
+        overnight_hrv = sleep_data.get("avgOvernightHrv") or daily_dto.get("avgOvernightHrv")
+        if overnight_hrv and float(overnight_hrv) > 0:
+            hrv_ms = round(float(overnight_hrv), 1)
+    except Exception:
+        pass
+
+    # 2. Fetch Dedicated HRV Summary if not already populated
+    if hrv_ms is None:
+        try:
+            hrv_data = client.get_hrv_data(date_str) or {}
+            hrv_summary = hrv_data.get("hrvSummary") or {}
+            val = hrv_summary.get("lastNightAvg") or hrv_summary.get("weeklyAvg")
+            if val and float(val) > 0:
+                hrv_ms = round(float(val), 1)
+        except Exception:
+            pass
+
+    # 3. Fallback for Resting Heart Rate via get_rhr_day or get_heart_rates
+    if resting_hr is None:
+        try:
+            hr_data = client.get_heart_rates(date_str) or {}
+            rhr_val = hr_data.get("restingHeartRate")
+            if rhr_val and float(rhr_val) > 0:
+                resting_hr = round(float(rhr_val), 1)
+        except Exception:
+            pass
+
+    return {
+        "sleepHours": sleep_hours,
+        "restingHR": resting_hr,
+        "hrv": hrv_ms
+    }
 
 
 def update_gist(gist_id: str, github_token: str, filename: str, payload: dict):
@@ -178,6 +230,7 @@ def main():
     existing_data = fetch_existing_gist(gist_id, github_token, gist_filename)
     sets_by_id = {s["id"]: s for s in existing_data.get("workoutLogs", []) if "id" in s}
     bw_by_date = {b["date"]: b for b in existing_data.get("bodyweightLogs", []) if "date" in b}
+    recovery_by_date = {r["date"]: r for r in existing_data.get("recoveryLogs", []) if "date" in r}
 
     print(f"Fetching Garmin activities from {start_date.isoformat()} to {end_date.isoformat()}...")
     all_activities = client.get_activities_by_date(start_date.isoformat(), end_date.isoformat())
@@ -262,18 +315,39 @@ def main():
     except Exception as e:
         print(f"Warning: Could not fetch body composition ({e})")
 
+    print(f"Fetching Garmin sleep, resting HR & HRV from {start_date.isoformat()} to {end_date.isoformat()}...")
+    cur_date = start_date
+    recovery_days_count = 0
+    while cur_date <= end_date:
+        d_str = cur_date.isoformat()
+        metrics = extract_sleep_and_hrv_for_date(client, d_str)
+        if metrics["sleepHours"] is not None or metrics["restingHR"] is not None or metrics["hrv"] is not None:
+            existing_rec = recovery_by_date.get(d_str, {})
+            recovery_by_date[d_str] = {
+                "id": f"garmin_rec_{d_str}",
+                "timestamp": int(datetime.fromisoformat(d_str).replace(tzinfo=timezone.utc).timestamp() * 1000),
+                "date": d_str,
+                "sleepHours": metrics["sleepHours"] if metrics["sleepHours"] is not None else existing_rec.get("sleepHours"),
+                "restingHR": metrics["restingHR"] if metrics["restingHR"] is not None else existing_rec.get("restingHR"),
+                "hrv": metrics["hrv"] if metrics["hrv"] is not None else existing_rec.get("hrv")
+            }
+            recovery_days_count += 1
+        cur_date += timedelta(days=1)
+
     merged_sets = sorted(sets_by_id.values(), key=lambda x: (x["date"], x["timestamp"]))
     merged_bw = sorted(bw_by_date.values(), key=lambda x: x["date"])
+    merged_recovery = sorted(recovery_by_date.values(), key=lambda x: x["date"])
 
     payload = {
         "lastSyncedAt": datetime.now(timezone.utc).isoformat(),
         "syncedDaysWindow": days_back,
         "workoutLogs": merged_sets,
-        "bodyweightLogs": merged_bw
+        "bodyweightLogs": merged_bw,
+        "recoveryLogs": merged_recovery
     }
 
     update_gist(gist_id, github_token, gist_filename, payload)
-    print(f"Sync complete! Total sets in Gist: {len(merged_sets)} (processed {new_sets_count} recent sets), Total weigh-ins: {len(merged_bw)}")
+    print(f"Sync complete! Total sets: {len(merged_sets)} (+{new_sets_count} recent), Weigh-ins: {len(merged_bw)}, Recovery days: {len(merged_recovery)} (+{recovery_days_count} checked)")
 
 
 if __name__ == "__main__":
