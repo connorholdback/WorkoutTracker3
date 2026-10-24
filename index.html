@@ -484,26 +484,26 @@
                     </label>
                 </div>
 
-                <div class="bg-surface-950 border border-gray-800 rounded-xl px-3.5 py-2.5 flex items-center justify-between">
-                    <div class="flex items-center gap-4">
+                <!-- Live Set Preview & Log Button -->
+                <div class="pt-2 border-t border-gray-800/80 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-3 text-xs">
                         <div>
-                            <span class="text-[10px] uppercase font-bold text-gray-400 block">Set Volume</span>
-                            <span id="live-volume" class="font-mono text-sm font-bold text-gray-200">480 kg</span>
+                            <span class="text-[10px] uppercase text-gray-400 block">Set Vol</span>
+                            <span id="live-volume" class="font-mono font-bold text-gray-200">480 kg</span>
                         </div>
-                        <div class="h-6 w-px bg-gray-800"></div>
                         <div>
-                            <span class="text-[10px] uppercase font-bold text-gray-400 block">Est. 1RM (Epley)</span>
-                            <span id="live-1rm" class="font-mono text-sm font-bold text-brand-400">76.0 kg</span>
+                            <span class="text-[10px] uppercase text-gray-400 block">Est. 1RM</span>
+                            <span id="live-1rm" class="font-mono font-bold text-brand-400">76 kg</span>
+                        </div>
+                        <div id="live-pr-badge" class="hidden px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-extrabold tracking-wide flex items-center gap-1">
+                            <i class="fa-solid fa-bolt"></i> <span id="live-pr-text">PR!</span>
                         </div>
                     </div>
-                    <div id="live-pr-badge" class="hidden px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-extrabold tracking-wide flex items-center gap-1 animate-pulse">
-                        <i class="fa-solid fa-bolt"></i> <span id="live-pr-text">NEW PR!</span>
-                    </div>
-                </div>
 
-                <button type="button" onclick="logWorkoutSet()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 active:scale-[0.99] text-surface-950 font-extrabold text-sm uppercase tracking-wider shadow-lg shadow-brand-500/25 flex items-center justify-center gap-2 transition">
-                    <i class="fa-solid fa-check-double"></i> Log Set
-                </button>
+                    <button type="button" onclick="logWorkoutSet()" class="px-5 py-3 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 active:scale-[0.99] text-surface-950 font-extrabold text-xs uppercase tracking-wider shadow-lg shadow-brand-500/25 flex items-center gap-2 transition">
+                        <i class="fa-solid fa-plus"></i> Log Set
+                    </button>
+                </div>
             </div>
 
             <!-- Bodyweight Check-in Card -->
@@ -521,26 +521,26 @@
                 <div class="grid grid-cols-12 gap-1.5 items-center">
                     <button type="button" onclick="stepBodyweight(-0.5)" class="col-span-2 h-10 rounded-xl bg-surface-800 active:bg-gray-700 font-mono font-bold text-xs text-gray-300 border border-gray-700/60">-0.5</button>
                     <button type="button" onclick="stepBodyweight(-0.1)" class="col-span-2 h-10 rounded-xl bg-surface-800 active:bg-gray-700 font-mono font-bold text-xs text-gray-200 border border-gray-700/60">-0.1</button>
-                    <input type="number" id="input-bodyweight" value="80.0" step="0.1" min="20" class="col-span-4 min-w-0 w-full h-10 bg-surface-950 border border-gray-700 rounded-xl text-center font-mono text-base font-extrabold text-white focus:outline-none focus:border-purple-400">
-                    <button type="button" onclick="stepBodyweight(0.1)" class="col-span-2 h-10 rounded-xl bg-surface-800 active:bg-gray-700 font-mono font-bold text-xs text-purple-400 border border-gray-700/60">+0.1</button>
-                    <button type="button" onclick="stepBodyweight(0.5)" class="col-span-2 h-10 rounded-xl bg-surface-800 active:bg-gray-700 font-mono font-bold text-xs text-purple-400 border border-gray-700/60">+0.5</button>
+                    <input type="number" id="input-bodyweight" value="80.0" step="0.1" min="20" max="300" oninput="this.dataset.userEdited='true'" class="col-span-4 min-w-0 w-full h-10 bg-surface-950 border border-gray-700 rounded-xl text-center font-mono text-base font-extrabold text-white focus:outline-none focus:border-purple-400">
+                    <button type="button" onclick="stepBodyweight(0.1)" class="col-span-2 h-10 rounded-xl bg-surface-800 active:bg-gray-700 font-mono font-bold text-xs text-purple-300 border border-gray-700/60">+0.1</button>
+                    <button type="button" onclick="stepBodyweight(0.5)" class="col-span-2 h-10 rounded-xl bg-surface-800 active:bg-gray-700 font-mono font-bold text-xs text-purple-300 border border-gray-700/60">+0.5</button>
                 </div>
 
                 <button type="button" onclick="logBodyweight()" class="w-full py-2.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 font-extrabold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-plus"></i> Log Bodyweight (kg)
+                    <i class="fa-solid fa-check"></i> Log Bodyweight (kg)
                 </button>
             </div>
 
-            <!-- Current Session Summary & Logged Sets -->
+            <!-- Current Session Sets List -->
             <div class="bg-surface-900 border border-gray-800/90 rounded-2xl p-4 shadow-lg space-y-3">
-                <div class="flex items-center justify-between border-b border-gray-800 pb-2.5">
+                <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-sm font-extrabold text-white uppercase tracking-wide">Session Sets (<span id="session-date-label">Today</span>)</h2>
-                        <p class="text-[11px] text-gray-400">Tap trash icon to remove a mistyped set</p>
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-white">Session Log (<span id="session-date-label">Today</span>)</h3>
+                        <p class="text-[11px] text-gray-400">Sets recorded for selected date</p>
                     </div>
                     <div class="text-right">
                         <span id="session-total-volume" class="font-mono text-sm font-extrabold text-brand-400">0 kg</span>
-                        <span id="session-total-sets" class="block text-[10px] uppercase tracking-wider text-gray-400">0 sets</span>
+                        <span id="session-total-sets" class="block text-[10px] text-gray-400">0 sets</span>
                     </div>
                 </div>
 
@@ -552,16 +552,23 @@
         <!-- TAB 2: VOLUME & PR ANALYTICS                              -->
         <!-- ========================================================= -->
         <section id="tab-analytics" class="hidden space-y-4">
-            
             <div class="bg-surface-900 border border-gray-800/90 rounded-2xl p-4 shadow-lg space-y-3.5">
                 <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Analyze Lift / Overview</label>
-                    <span id="analytics-mode-pill" class="text-[11px] font-mono text-brand-400">Global % Improvement, Volume & BW</span>
+                    <div>
+                        <h2 class="text-sm font-extrabold uppercase tracking-wider text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-brand-400"></i> Volume & PR Progression
+                        </h2>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Analyze tonnage, estimated 1RM, and bodyweight trends</p>
+                    </div>
                 </div>
-                <select id="analytics-exercise-select" onchange="onAnalyticsExerciseChange()" class="w-full bg-surface-950 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white focus:outline-none focus:border-brand-500"></select>
 
-                <div class="pt-1 border-t border-gray-800/80 space-y-2.5">
-                    <div class="flex items-center justify-between gap-2">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Exercise Scope</label>
+                    <select id="analytics-exercise-select" onchange="onAnalyticsExerciseChange()" class="w-full bg-surface-950 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-brand-500 transition"></select>
+                </div>
+
+                <div class="pt-2 border-t border-gray-800/80 space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Date Range</span>
                         <div class="flex bg-surface-950 p-1 rounded-xl border border-gray-800 gap-1">
                             <button type="button" id="range-btn-12w" onclick="setAnalyticsDatePreset('12w')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">12 Weeks</button>
@@ -590,56 +597,56 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2.5 pt-1">
-                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-3">
-                        <span id="stat-card1-label" class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">Heaviest Weight</span>
-                        <span id="stat-max-weight" class="font-mono text-lg font-extrabold text-white mt-0.5 block">—</span>
-                        <span id="stat-max-weight-sub" class="text-[11px] text-gray-400">No sets yet</span>
+                <!-- Summary KPI Cards -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
+                        <span id="stat-card1-label" class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">Active Lifts</span>
+                        <span id="stat-max-weight" class="font-mono text-base font-extrabold text-white mt-0.5 block">—</span>
+                        <span id="stat-max-weight-sub" class="text-[10px] text-gray-500">Logged in range</span>
                     </div>
-                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-3">
-                        <span id="stat-card2-label" class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">Best Est. 1RM</span>
-                        <span id="stat-best-1rm" class="font-mono text-lg font-extrabold text-amber-400 mt-0.5 block">—</span>
-                        <span id="stat-best-1rm-sub" class="text-[11px] text-gray-400">Calculated peak</span>
+                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
+                        <span id="stat-card2-label" class="text-[10px] font-bold uppercase tracking-wider text-brand-400 block">Peak Avg % Gain</span>
+                        <span id="stat-best-1rm" class="font-mono text-base font-extrabold text-white mt-0.5 block">—</span>
+                        <span id="stat-best-1rm-sub" class="text-[10px] text-gray-500">vs range baseline</span>
                     </div>
-                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-3">
-                        <span id="stat-card3-label" class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">Peak Interval Vol</span>
-                        <span id="stat-max-vol" class="font-mono text-lg font-extrabold text-brand-400 mt-0.5 block">—</span>
-                        <span id="stat-max-vol-sub" class="text-[11px] text-gray-400">Best week/month</span>
+                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400 block">Peak Interval Vol</span>
+                        <span id="stat-max-vol" class="font-mono text-base font-extrabold text-white mt-0.5 block">—</span>
+                        <span id="stat-max-vol-sub" class="text-[10px] text-gray-500">Best week</span>
                     </div>
-                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-3">
-                        <span id="stat-card4-label" class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">Range Tonnage</span>
-                        <span id="stat-cum-vol" class="font-mono text-lg font-extrabold text-sky-400 mt-0.5 block">—</span>
-                        <span id="stat-cum-sets" class="text-[11px] text-gray-400">0 total sets</span>
+                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 block">Total Tonnage</span>
+                        <span id="stat-cum-vol" class="font-mono text-base font-extrabold text-white mt-0.5 block">—</span>
+                        <span id="stat-cum-sets" class="text-[10px] text-gray-500">0 total sets</span>
                     </div>
                 </div>
 
-                <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-3 flex items-center justify-between">
+                <!-- Bodyweight Range Summary Banner -->
+                <div class="bg-surface-950 border border-purple-500/30 rounded-xl px-3 py-2 flex items-center justify-between text-xs">
                     <div>
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-purple-400 block">Bodyweight (Selected Range)</span>
-                        <span id="stat-bw-current" class="font-mono text-sm font-extrabold text-white mt-0.5 block">—</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-purple-400 block">Bodyweight Trend</span>
+                        <span id="stat-bw-current" class="font-mono font-bold text-gray-200">—</span>
                     </div>
                     <div class="text-right">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">Range BW Change</span>
-                        <span id="stat-bw-change" class="font-mono text-sm font-extrabold text-purple-400 mt-0.5 block">—</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">Range Delta</span>
+                        <span id="stat-bw-change" class="font-mono font-extrabold text-purple-300">—</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Interactive Chart Card -->
-            <div class="bg-surface-900 border border-gray-800/90 rounded-2xl p-4 shadow-lg space-y-3">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                        <h3 id="chart-title-heading" class="text-xs font-extrabold uppercase tracking-wider text-white">Progression & Volume</h3>
-                        <p id="chart-subtitle-desc" class="text-[11px] text-gray-400">Aggregated by week across selected date range</p>
+                <!-- Chart Mode Switcher & Canvas -->
+                <div class="space-y-2 pt-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Chart Overlay Mode</span>
+                        <div class="flex bg-surface-950 p-1 rounded-xl border border-gray-800 gap-1">
+                            <button type="button" id="chart-mode-combined" onclick="setChartMode('combined')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition">Combined</button>
+                            <button type="button" id="chart-mode-1rm" onclick="setChartMode('1rm')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition"><span id="chart-mode-1rm-label">Avg % Gain + BW %</span></button>
+                            <button type="button" id="chart-mode-vol" onclick="setChartMode('volume')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">Vol + BW (kg)</button>
+                        </div>
                     </div>
-                    <div class="flex flex-wrap bg-surface-950 p-1 rounded-xl border border-gray-800 gap-1">
-                        <button id="chart-mode-combined" onclick="setChartMode('combined')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition">Progression + Vol</button>
-                        <button id="chart-mode-1rm" onclick="setChartMode('1rm')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition"><span id="chart-mode-1rm-label">Avg % Gain + BW %</span></button>
-                        <button id="chart-mode-vol" onclick="setChartMode('volume')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">Vol + BW (kg)</button>
+
+                    <div class="relative h-64 w-full pt-1">
+                        <canvas id="progressionChart"></canvas>
                     </div>
-                </div>
-                <div class="relative h-64 w-full">
-                    <canvas id="progressionChart"></canvas>
                 </div>
             </div>
 
@@ -671,6 +678,168 @@
         </section>
 
         <!-- ========================================================= -->
+        <!-- TAB 2B: RECOVERY & DUAL-METRIC CORRELATION ANALYZER       -->
+        <!-- ========================================================= -->
+        <section id="tab-recovery" class="hidden space-y-4">
+
+            <!-- Recovery Overview & Date / Interval Controls -->
+            <div class="bg-surface-900 border border-gray-800/90 rounded-2xl p-4 shadow-lg space-y-3.5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-sm font-extrabold uppercase tracking-wider text-white flex items-center gap-2">
+                            <i class="fa-solid fa-heart-pulse text-rose-400"></i> Recovery & Correlation Lab
+                        </h2>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Compare any 2 Sleep, HRV, RHR, Volume, or Strength metrics</p>
+                    </div>
+                    <span class="text-[10px] font-mono text-sky-400 bg-sky-500/10 border border-sky-500/30 px-2 py-0.5 rounded-lg">Garmin + Manual</span>
+                </div>
+
+                <div class="pt-2 border-t border-gray-800/80 space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Date Range</span>
+                        <div class="flex bg-surface-950 p-1 rounded-xl border border-gray-800 gap-1">
+                            <button type="button" id="rec-range-btn-4w" onclick="setRecoveryDatePreset('4w')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">4W</button>
+                            <button type="button" id="rec-range-btn-12w" onclick="setRecoveryDatePreset('12w')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition">12W</button>
+                            <button type="button" id="rec-range-btn-12m" onclick="setRecoveryDatePreset('12m')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">12M</button>
+                            <button type="button" id="rec-range-btn-all" onclick="setRecoveryDatePreset('all')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">All Time</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Start Date</label>
+                            <input type="date" id="recovery-start-date" onchange="onCustomRecoveryDateChange()" class="w-full bg-surface-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">End Date</label>
+                            <input type="date" id="recovery-end-date" onchange="onCustomRecoveryDateChange()" class="w-full bg-surface-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Aggregation Interval</span>
+                        <div class="flex bg-surface-950 p-1 rounded-xl border border-gray-800 gap-1">
+                            <button type="button" id="rec-int-btn-daily" onclick="setRecoveryInterval('daily')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">Daily</button>
+                            <button type="button" id="rec-int-btn-weekly" onclick="setRecoveryInterval('weekly')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition">Weekly</button>
+                            <button type="button" id="rec-int-btn-monthly" onclick="setRecoveryInterval('monthly')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">Monthly</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Averages in Selected Range -->
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400 block">Avg Sleep</span>
+                        <span id="rec-stat-sleep" class="font-mono text-base font-extrabold text-white mt-0.5 block">—</span>
+                        <span id="rec-stat-sleep-sub" class="text-[10px] text-gray-500">Nightly hrs</span>
+                    </div>
+                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">Avg Night HRV</span>
+                        <span id="rec-stat-hrv" class="font-mono text-base font-extrabold text-white mt-0.5 block">—</span>
+                        <span id="rec-stat-hrv-sub" class="text-[10px] text-gray-500">Overnight ms</span>
+                    </div>
+                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-rose-400 block">Avg Night RHR</span>
+                        <span id="rec-stat-rhr" class="font-mono text-base font-extrabold text-white mt-0.5 block">—</span>
+                        <span id="rec-stat-rhr-sub" class="text-[10px] text-gray-500">Resting bpm</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dual-Metric Selector & Correlation Chart Card -->
+            <div class="bg-surface-900 border border-gray-800/90 rounded-2xl p-4 shadow-lg space-y-3.5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div class="bg-surface-950 border border-emerald-500/40 rounded-xl p-2.5">
+                        <label class="block text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 mb-1">
+                            <i class="fa-solid fa-chart-line mr-1"></i> Metric A (Left Axis)
+                        </label>
+                        <select id="recovery-metric-a" onchange="renderRecoveryPage()" class="w-full bg-surface-900 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-emerald-400">
+                            <option value="sleepHours">Sleep Duration (hrs)</option>
+                            <option value="hrv" selected>Nightly HRV (ms)</option>
+                            <option value="restingHR">Night Resting HR (bpm)</option>
+                            <option value="volume">Training Volume (kg)</option>
+                            <option value="sets">Training Sets (count)</option>
+                            <option value="progressionPct">Strength Progression (% Gain)</option>
+                            <option value="bodyweight">Bodyweight (kg)</option>
+                            <option value="bodyweightPct">Bodyweight (% Change)</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-surface-950 border border-sky-500/40 rounded-xl p-2.5">
+                        <label class="block text-[10px] font-extrabold uppercase tracking-wider text-sky-400 mb-1">
+                            <i class="fa-solid fa-layer-group mr-1"></i> Metric B (Right Axis)
+                        </label>
+                        <select id="recovery-metric-b" onchange="renderRecoveryPage()" class="w-full bg-surface-900 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-400">
+                            <option value="none">— None (Single Metric) —</option>
+                            <option value="sleepHours">Sleep Duration (hrs)</option>
+                            <option value="hrv">Nightly HRV (ms)</option>
+                            <option value="restingHR">Night Resting HR (bpm)</option>
+                            <option value="volume" selected>Training Volume (kg)</option>
+                            <option value="sets">Training Sets (count)</option>
+                            <option value="progressionPct">Strength Progression (% Gain)</option>
+                            <option value="bodyweight">Bodyweight (kg)</option>
+                            <option value="bodyweightPct">Bodyweight (% Change)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Optional Lift Filter when Progression %, Volume, or Sets is chosen -->
+                <div id="recovery-lift-filter-row" class="bg-surface-950/90 border border-gray-800 rounded-xl px-3 py-2 flex items-center justify-between gap-2">
+                    <span class="text-[11px] font-bold text-gray-400">Training Metric Scope:</span>
+                    <select id="recovery-exercise-filter" onchange="renderRecoveryPage()" class="bg-surface-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs font-bold text-white focus:outline-none focus:border-brand-500 max-w-[210px]"></select>
+                </div>
+
+                <!-- Quick 1-Tap Comparison Presets -->
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500 mr-1">Quick Pairs:</span>
+                    <button type="button" onclick="setRecoveryMetricPair('sleepHours', 'hrv')" class="px-2 py-1 rounded-lg bg-surface-950 hover:bg-surface-800 border border-gray-800 text-[10px] font-bold text-gray-300 transition">Sleep vs HRV</button>
+                    <button type="button" onclick="setRecoveryMetricPair('hrv', 'volume')" class="px-2 py-1 rounded-lg bg-surface-950 hover:bg-surface-800 border border-gray-800 text-[10px] font-bold text-gray-300 transition">HRV vs Volume</button>
+                    <button type="button" onclick="setRecoveryMetricPair('progressionPct', 'restingHR')" class="px-2 py-1 rounded-lg bg-surface-950 hover:bg-surface-800 border border-gray-800 text-[10px] font-bold text-gray-300 transition">Progression % vs RHR</button>
+                    <button type="button" onclick="setRecoveryMetricPair('sleepHours', 'progressionPct')" class="px-2 py-1 rounded-lg bg-surface-950 hover:bg-surface-800 border border-gray-800 text-[10px] font-bold text-gray-300 transition">Sleep vs Progression %</button>
+                </div>
+
+                <div class="relative h-64 w-full pt-1">
+                    <canvas id="recoveryCorrelationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Manual / Override Recovery Log Card -->
+            <div class="bg-surface-900 border border-gray-800/90 rounded-2xl p-4 shadow-lg space-y-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-white flex items-center gap-1.5">
+                            <i class="fa-solid fa-bed-pulse text-indigo-400"></i> Log / Edit Nightly Recovery
+                        </h3>
+                        <p class="text-[11px] text-gray-400">Auto-populated via Garmin Sync or log manually for any date</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Date</label>
+                        <input type="date" id="rec-input-date" onchange="populateRecoveryInputForDate()" class="w-full bg-surface-950 border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-indigo-400 mb-1">Sleep (hrs)</label>
+                        <input type="number" id="rec-input-sleep" step="0.1" min="0" max="24" placeholder="7.5" class="w-full bg-surface-950 border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-indigo-400">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-emerald-400 mb-1">Night HRV (ms)</label>
+                        <input type="number" id="rec-input-hrv" step="1" min="1" max="250" placeholder="68" class="w-full bg-surface-950 border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-400">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-rose-400 mb-1">Resting HR (bpm)</label>
+                        <input type="number" id="rec-input-rhr" step="1" min="25" max="150" placeholder="52" class="w-full bg-surface-950 border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-rose-400">
+                    </div>
+                </div>
+
+                <button type="button" onclick="saveManualRecoveryLog()" class="w-full py-2.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 font-extrabold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Nightly Recovery Metrics
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
         <!-- TAB 3: WORKOUT HISTORY, GARMIN CLOUD SYNC & BACKUP        -->
         <!-- ========================================================= -->
         <section id="tab-history" class="hidden space-y-4">
@@ -682,7 +851,7 @@
                         <h2 class="text-sm font-extrabold uppercase tracking-wider text-white flex items-center gap-2">
                             <i class="fa-solid fa-satellite-dish text-sky-400"></i> Garmin Cloud Sync (Hands-Free)
                         </h2>
-                        <p id="garmin-last-sync-label" class="text-[11px] text-gray-400 mt-0.5">Pulls watch strength sets & weigh-ins from your GitHub Gist</p>
+                        <p id="garmin-last-sync-label" class="text-[11px] text-gray-400 mt-0.5">Pulls watch sets, weigh-ins, sleep, RHR & HRV from your Gist</p>
                     </div>
                     <button type="button" onclick="openGarminMapperModal()" class="px-2.5 py-1 rounded-xl bg-surface-800 hover:bg-gray-700 border border-gray-700 text-[11px] font-bold text-sky-300 transition flex items-center gap-1">
                         <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Lift Mapper
@@ -1026,23 +1195,27 @@
     </div>
 
     <!-- ================= BOTTOM NAVIGATION BAR ================= -->
-    <nav class="fixed bottom-0 left-0 right-0 z-30 bg-surface-950/95 backdrop-blur-md border-t border-gray-800/90 px-4 py-2">
-        <div class="max-w-lg mx-auto grid grid-cols-4 gap-1.5">
+    <nav class="fixed bottom-0 left-0 right-0 z-30 bg-surface-950/95 backdrop-blur-md border-t border-gray-800/90 px-2 py-2">
+        <div class="max-w-lg mx-auto grid grid-cols-5 gap-1">
             <button id="nav-status" onclick="switchTab('status')" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-brand-400 bg-brand-500/10 font-bold transition">
                 <i class="fa-solid fa-child-reaching text-base mb-0.5"></i>
-                <span class="text-[11px]">Status</span>
+                <span class="text-[10px]">Status</span>
             </button>
             <button id="nav-logger" onclick="switchTab('logger')" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-gray-400 hover:text-gray-200 font-semibold transition">
                 <i class="fa-solid fa-dumbbell text-base mb-0.5"></i>
-                <span class="text-[11px]">Log Workout</span>
+                <span class="text-[10px]">Log</span>
             </button>
             <button id="nav-analytics" onclick="switchTab('analytics')" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-gray-400 hover:text-gray-200 font-semibold transition">
                 <i class="fa-solid fa-chart-line text-base mb-0.5"></i>
-                <span class="text-[11px]">Volume & PRs</span>
+                <span class="text-[10px]">Vol & PRs</span>
+            </button>
+            <button id="nav-recovery" onclick="switchTab('recovery')" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-gray-400 hover:text-gray-200 font-semibold transition">
+                <i class="fa-solid fa-heart-pulse text-base mb-0.5"></i>
+                <span class="text-[10px]">Recovery</span>
             </button>
             <button id="nav-history" onclick="switchTab('history')" class="flex flex-col items-center justify-center py-1.5 rounded-xl text-gray-400 hover:text-gray-200 font-semibold transition">
                 <i class="fa-solid fa-database text-base mb-0.5"></i>
-                <span class="text-[11px]">History & Data</span>
+                <span class="text-[10px]">Data</span>
             </button>
         </div>
     </nav>
@@ -1055,6 +1228,7 @@
         const STORAGE_LOGS_KEY = 'ironpulse_workout_sets_v1';
         const STORAGE_EXERCISES_KEY = 'ironpulse_exercises_v4';
         const STORAGE_BW_KEY = 'ironpulse_bodyweight_v1';
+        const STORAGE_RECOVERY_KEY = 'ironpulse_recovery_v1';
         const STORAGE_TIERS_KEY = 'ironpulse_heat_tiers_v1';
         const STORAGE_GARMIN_CFG_KEY = 'ironpulse_garmin_cfg_v1';
         const STORAGE_GARMIN_MAP_KEY = 'ironpulse_garmin_map_v1';
@@ -1139,6 +1313,7 @@
         let workoutLogs = [];
         let exercises = [];
         let bodyweightLogs = [];
+        let recoveryLogs = [];
         let heatTierThresholds = { ...DEFAULT_HEAT_TIERS };
         let garminConfig = {
             gistId: '',
@@ -1156,8 +1331,11 @@
         let currentChartMode = 'combined';
         let analyticsDatePreset = '12m';
         let analyticsInterval = 'weekly';
+        let recoveryDatePreset = '12w';
+        let recoveryInterval = 'weekly';
         let statusDatePreset = '4w';
         let progressionChartInstance = null;
+        let recoveryChartInstance = null;
         let selectedDiagramMuscle = null;
 
         // Rest Timer State
@@ -1175,11 +1353,15 @@
 
             const todayStr = getLocalTodayDateString();
             document.getElementById('log-date').value = todayStr;
+            const recDateEl = document.getElementById('rec-input-date');
+            if (recDateEl) recDateEl.value = todayStr;
 
             populateExerciseSelect();
             populateGarminSyncInputsUI();
             setStatusDatePreset('4w', false);
             setAnalyticsDatePreset('12m', false);
+            setRecoveryDatePreset('12w', false);
+            populateRecoveryInputForDate();
             onDateOrExerciseChange();
             updateBodyweightUI();
             updateStorageSummary();
@@ -1317,6 +1499,9 @@
                 const rawBw = localStorage.getItem(STORAGE_BW_KEY);
                 bodyweightLogs = rawBw ? JSON.parse(rawBw) : [];
 
+                const rawRec = localStorage.getItem(STORAGE_RECOVERY_KEY);
+                recoveryLogs = rawRec ? JSON.parse(rawRec) : [];
+
                 const rawTiers = localStorage.getItem(STORAGE_TIERS_KEY);
                 if (rawTiers) {
                     heatTierThresholds = normalizeHeatTiers(JSON.parse(rawTiers));
@@ -1338,6 +1523,7 @@
                 workoutLogs = [];
                 exercises = JSON.parse(JSON.stringify(DEFAULT_EXERCISES));
                 bodyweightLogs = [];
+                recoveryLogs = [];
                 heatTierThresholds = { ...DEFAULT_HEAT_TIERS };
             }
         }
@@ -1361,6 +1547,7 @@
                 localStorage.setItem(STORAGE_LOGS_KEY, JSON.stringify(workoutLogs));
                 localStorage.setItem(STORAGE_EXERCISES_KEY, JSON.stringify(exercises));
                 localStorage.setItem(STORAGE_BW_KEY, JSON.stringify(bodyweightLogs));
+                localStorage.setItem(STORAGE_RECOVERY_KEY, JSON.stringify(recoveryLogs));
                 localStorage.setItem(STORAGE_TIERS_KEY, JSON.stringify(heatTierThresholds));
                 localStorage.setItem(STORAGE_GARMIN_CFG_KEY, JSON.stringify(garminConfig));
                 localStorage.setItem(STORAGE_GARMIN_MAP_KEY, JSON.stringify(garminExerciseMap));
@@ -1549,6 +1736,7 @@
 
                 const allIncomingSets = Array.isArray(payload.workoutLogs) ? payload.workoutLogs : [];
                 const allIncomingBw = Array.isArray(payload.bodyweightLogs) ? payload.bodyweightLogs : [];
+                const allIncomingRec = Array.isArray(payload.recoveryLogs) ? payload.recoveryLogs : [];
 
                 const incomingSets = allIncomingSets.filter(s => {
                     const d = String(s.date || '').slice(0, 10);
@@ -1556,6 +1744,10 @@
                 });
                 const incomingBw = allIncomingBw.filter(b => {
                     const d = String(b.date || '').slice(0, 10);
+                    return d >= filterStart && d <= filterEnd;
+                });
+                const incomingRec = allIncomingRec.filter(r => {
+                    const d = String(r.date || '').slice(0, 10);
                     return d >= filterStart && d <= filterEnd;
                 });
 
@@ -1583,6 +1775,7 @@
                     pendingGarminImport = {
                         incomingSets,
                         incomingBw,
+                        incomingRec,
                         filterStart,
                         filterEnd,
                         lastSyncedAt: payload.lastSyncedAt || new Date().toISOString(),
@@ -1593,7 +1786,7 @@
                     return;
                 }
 
-                finalizeGarminDataImport(incomingSets, incomingBw, filterStart, filterEnd, payload.lastSyncedAt, isSilentStartup);
+                finalizeGarminDataImport(incomingSets, incomingBw, incomingRec, filterStart, filterEnd, payload.lastSyncedAt, isSilentStartup);
             } catch (err) {
                 console.error('Garmin Gist Sync Error:', err);
                 if (!isSilentStartup) {
@@ -1604,8 +1797,8 @@
             }
         }
 
-        function finalizeGarminDataImport(incomingSets, incomingBw, filterStart, filterEnd, syncedTimestamp, isSilentStartup = false) {
-            // If strictRange is enabled, prune previously synced Garmin sets & weigh-ins outside [filterStart, filterEnd]
+        function finalizeGarminDataImport(incomingSets, incomingBw, incomingRec = [], filterStart, filterEnd, syncedTimestamp, isSilentStartup = false) {
+            // If strictRange is enabled, prune previously synced Garmin sets, weigh-ins & recovery logs outside [filterStart, filterEnd]
             let removedOutOfRange = 0;
             if (garminConfig.strictRange !== false && filterStart && filterEnd) {
                 const beforeCount = workoutLogs.length;
@@ -1621,6 +1814,13 @@
                     const isGarminBw = String(b.id || '').startsWith('garmin_bw_');
                     if (!isGarminBw) return true;
                     const d = String(b.date || '').slice(0, 10);
+                    return d >= filterStart && d <= filterEnd;
+                });
+
+                recoveryLogs = recoveryLogs.filter(r => {
+                    const isGarminRec = String(r.id || '').startsWith('garmin_rec_');
+                    if (!isGarminRec) return true;
+                    const d = String(r.date || '').slice(0, 10);
                     return d >= filterStart && d <= filterEnd;
                 });
             }
@@ -1694,14 +1894,44 @@
                 }
             });
 
+            let syncedRecCount = 0;
+            (incomingRec || []).forEach(recEntry => {
+                if (!recEntry.date) return;
+                const dStr = String(recEntry.date).slice(0, 10);
+                const sleepVal = recEntry.sleepHours !== null && recEntry.sleepHours !== undefined ? +parseFloat(recEntry.sleepHours).toFixed(2) : null;
+                const rhrVal = recEntry.restingHR !== null && recEntry.restingHR !== undefined ? +parseFloat(recEntry.restingHR).toFixed(1) : null;
+                const hrvVal = recEntry.hrv !== null && recEntry.hrv !== undefined ? +parseFloat(recEntry.hrv).toFixed(1) : null;
+
+                if (sleepVal === null && rhrVal === null && hrvVal === null) return;
+
+                const existingIdx = recoveryLogs.findIndex(r => r.date === dStr);
+                if (existingIdx > -1) {
+                    if (sleepVal !== null) recoveryLogs[existingIdx].sleepHours = sleepVal;
+                    if (rhrVal !== null) recoveryLogs[existingIdx].restingHR = rhrVal;
+                    if (hrvVal !== null) recoveryLogs[existingIdx].hrv = hrvVal;
+                } else {
+                    recoveryLogs.push({
+                        id: recEntry.id || `garmin_rec_${dStr}`,
+                        timestamp: recEntry.timestamp || Date.now(),
+                        date: dStr,
+                        sleepHours: sleepVal,
+                        restingHR: rhrVal,
+                        hrv: hrvVal
+                    });
+                }
+                syncedRecCount++;
+            });
+
             garminConfig.lastSyncedAt = syncedTimestamp || new Date().toISOString();
             saveToLocalStorage();
             populateExerciseSelect();
             populateGarminSyncInputsUI();
+            populateRecoveryInputForDate();
             onDateOrExerciseChange();
             updateBodyweightUI();
             renderStatusPage();
             if (!document.getElementById('tab-analytics').classList.contains('hidden')) renderAnalytics();
+            if (!document.getElementById('tab-recovery').classList.contains('hidden')) renderRecoveryPage();
             if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistoryList();
 
             const headerStatus = document.getElementById('header-status');
@@ -1709,9 +1939,10 @@
                 headerStatus.textContent = `Garmin Synced • ${workoutLogs.length} sets`;
             }
 
-            if (!isSilentStartup || addedSets > 0 || addedBw > 0 || removedOutOfRange > 0) {
-                const prunedText = removedOutOfRange > 0 ? `, -${removedOutOfRange} outside range` : '';
-                showToast(`Garmin Sync (${filterStart} → ${filterEnd}): +${addedSets} new, ${updatedSets} upd${prunedText}`);
+            if (!isSilentStartup || addedSets > 0 || addedBw > 0 || syncedRecCount > 0 || removedOutOfRange > 0) {
+                const recText = syncedRecCount > 0 ? `, ${syncedRecCount} recovery` : '';
+                const prunedText = removedOutOfRange > 0 ? `, -${removedOutOfRange} pruned` : '';
+                showToast(`Garmin Sync: +${addedSets} sets, ${updatedSets} upd${recText}${prunedText}`);
             }
         }
 
@@ -1930,9 +2161,9 @@
             document.getElementById('garmin-mapper-modal').classList.add('hidden');
 
             if (pendingGarminImport) {
-                const { incomingSets, incomingBw, filterStart, filterEnd, lastSyncedAt } = pendingGarminImport;
+                const { incomingSets, incomingBw, incomingRec, filterStart, filterEnd, lastSyncedAt } = pendingGarminImport;
                 pendingGarminImport = null;
-                finalizeGarminDataImport(incomingSets, incomingBw, filterStart, filterEnd, lastSyncedAt, false);
+                finalizeGarminDataImport(incomingSets, incomingBw, incomingRec || [], filterStart, filterEnd, lastSyncedAt, false);
             } else {
                 saveToLocalStorage();
                 populateExerciseSelect();
@@ -2543,7 +2774,7 @@
          * 4. NAVIGATION & WORKOUT LOGGER LOGIC
          **************************************************************/
         function switchTab(tabName) {
-            const tabs = ['status', 'logger', 'analytics', 'history'];
+            const tabs = ['status', 'logger', 'analytics', 'recovery', 'history'];
             tabs.forEach(t => {
                 const sectionEl = document.getElementById(`tab-${t}`);
                 const navEl = document.getElementById(`nav-${t}`);
@@ -2562,6 +2793,7 @@
                 updateBodyweightUI();
             }
             if (tabName === 'analytics') renderAnalytics();
+            if (tabName === 'recovery') renderRecoveryPage();
             if (tabName === 'history') renderHistoryList();
         }
 
@@ -2569,9 +2801,11 @@
             const filterCat = document.getElementById('category-filter')?.value || 'ALL';
             const logSelect = document.getElementById('log-exercise');
             const analyticsSelect = document.getElementById('analytics-exercise-select');
+            const recoveryExSelect = document.getElementById('recovery-exercise-filter');
 
             const currentLogSelection = logSelect?.value;
             const currentAnalyticsSelection = analyticsSelect?.value;
+            const currentRecoveryExSelection = recoveryExSelect?.value;
 
             const filtered = filterCat === 'ALL'
                 ? exercises
@@ -2588,13 +2822,22 @@
                 }
             }
 
+            const globalAndLiftsHtml = [
+                `<option value="__ALL__">All Exercises (Global Overview)</option>`,
+                ...exercises.map(e => `<option value="${escapeHtml(e.name)}">${escapeHtml(e.name)}</option>`)
+            ].join('');
+
             if (analyticsSelect) {
-                analyticsSelect.innerHTML = [
-                    `<option value="__ALL__">All Exercises (Global Overview)</option>`,
-                    ...exercises.map(e => `<option value="${escapeHtml(e.name)}">${escapeHtml(e.name)}</option>`)
-                ].join('');
+                analyticsSelect.innerHTML = globalAndLiftsHtml;
                 if (currentAnalyticsSelection && (currentAnalyticsSelection === '__ALL__' || exercises.some(e => e.name === currentAnalyticsSelection))) {
                     analyticsSelect.value = currentAnalyticsSelection;
+                }
+            }
+
+            if (recoveryExSelect) {
+                recoveryExSelect.innerHTML = globalAndLiftsHtml;
+                if (currentRecoveryExSelection && (currentRecoveryExSelection === '__ALL__' || exercises.some(e => e.name === currentRecoveryExSelection))) {
+                    recoveryExSelect.value = currentRecoveryExSelection;
                 }
             }
         }
@@ -3407,12 +3650,460 @@
         }
 
         /**************************************************************
+         * 8B. RECOVERY & DUAL-METRIC CORRELATION ENGINE
+         **************************************************************/
+        const CORRELATION_METRICS_META = {
+            sleepHours: {
+                label: 'Sleep Duration (hrs)',
+                unit: 'hrs',
+                color: '#818cf8',
+                bg: 'rgba(129, 140, 248, 0.18)',
+                defaultChartType: 'bar'
+            },
+            hrv: {
+                label: 'Nightly HRV (ms)',
+                unit: 'ms',
+                color: '#34d399',
+                bg: 'rgba(52, 211, 153, 0.18)',
+                defaultChartType: 'line'
+            },
+            restingHR: {
+                label: 'Night Resting HR (bpm)',
+                unit: 'bpm',
+                color: '#fb7185',
+                bg: 'rgba(251, 113, 133, 0.18)',
+                defaultChartType: 'line'
+            },
+            volume: {
+                label: 'Training Volume (kg)',
+                unit: 'kg',
+                color: '#38bdf8',
+                bg: 'rgba(56, 189, 248, 0.25)',
+                defaultChartType: 'bar'
+            },
+            sets: {
+                label: 'Training Sets',
+                unit: 'sets',
+                color: '#f59e0b',
+                bg: 'rgba(245, 158, 11, 0.25)',
+                defaultChartType: 'bar'
+            },
+            progressionPct: {
+                label: 'Strength Progression (%)',
+                unit: '%',
+                color: '#10b981',
+                bg: 'rgba(16, 185, 129, 0.18)',
+                defaultChartType: 'line'
+            },
+            bodyweight: {
+                label: 'Bodyweight (kg)',
+                unit: 'kg',
+                color: '#c084fc',
+                bg: 'rgba(192, 132, 252, 0.18)',
+                defaultChartType: 'line'
+            },
+            bodyweightPct: {
+                label: 'Bodyweight (% Change)',
+                unit: '%',
+                color: '#e879f9',
+                bg: 'rgba(232, 121, 249, 0.18)',
+                defaultChartType: 'line'
+            }
+        };
+
+        function setRecoveryDatePreset(preset, shouldRender = true) {
+            recoveryDatePreset = preset;
+            const today = new Date();
+            const endStr = formatLocalDate(today);
+            let startStr = '';
+
+            if (preset === '4w') {
+                startStr = formatLocalDate(new Date(today.getTime() - 28 * 86400000));
+            } else if (preset === '12w') {
+                startStr = formatLocalDate(new Date(today.getTime() - 84 * 86400000));
+            } else if (preset === '12m') {
+                startStr = formatLocalDate(new Date(today.getTime() - 365 * 86400000));
+            } else if (preset === 'all') {
+                const allDates = [
+                    ...workoutLogs.map(s => s.date),
+                    ...bodyweightLogs.map(b => b.date),
+                    ...recoveryLogs.map(r => r.date)
+                ];
+                if (allDates.length > 0) {
+                    startStr = allDates.reduce((min, d) => d < min ? d : min, allDates[0]);
+                } else {
+                    startStr = formatLocalDate(new Date(today.getTime() - 84 * 86400000));
+                }
+            }
+
+            const startEl = document.getElementById('recovery-start-date');
+            const endEl = document.getElementById('recovery-end-date');
+            if (startEl) startEl.value = startStr;
+            if (endEl) endEl.value = endStr;
+
+            updateRecoveryPresetButtonsUI();
+            if (shouldRender) renderRecoveryPage();
+        }
+
+        function onCustomRecoveryDateChange() {
+            recoveryDatePreset = 'custom';
+            updateRecoveryPresetButtonsUI();
+            renderRecoveryPage();
+        }
+
+        function updateRecoveryPresetButtonsUI() {
+            ['4w', '12w', '12m', 'all'].forEach(p => {
+                const btn = document.getElementById(`rec-range-btn-${p}`);
+                if (!btn) return;
+                btn.className = recoveryDatePreset === p
+                    ? 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition'
+                    : 'px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition';
+            });
+        }
+
+        function setRecoveryInterval(interval) {
+            recoveryInterval = interval;
+            ['daily', 'weekly', 'monthly'].forEach(i => {
+                const btn = document.getElementById(`rec-int-btn-${i}`);
+                if (!btn) return;
+                btn.className = recoveryInterval === i
+                    ? 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition'
+                    : 'px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition';
+            });
+            renderRecoveryPage();
+        }
+
+        function setRecoveryMetricPair(metricA, metricB) {
+            const selA = document.getElementById('recovery-metric-a');
+            const selB = document.getElementById('recovery-metric-b');
+            if (selA) selA.value = metricA;
+            if (selB) selB.value = metricB;
+            renderRecoveryPage();
+        }
+
+        function getRecoveryBucketKey(dateStr, intervalType) {
+            if (intervalType === 'daily') return dateStr;
+            return getIntervalBucketKey(dateStr, intervalType);
+        }
+
+        function populateRecoveryInputForDate() {
+            const dateStr = document.getElementById('rec-input-date')?.value || getLocalTodayDateString();
+            const existing = recoveryLogs.find(r => r.date === dateStr);
+            const sleepEl = document.getElementById('rec-input-sleep');
+            const hrvEl = document.getElementById('rec-input-hrv');
+            const rhrEl = document.getElementById('rec-input-rhr');
+
+            if (existing) {
+                if (sleepEl) sleepEl.value = existing.sleepHours ?? '';
+                if (hrvEl) hrvEl.value = existing.hrv ?? '';
+                if (rhrEl) rhrEl.value = existing.restingHR ?? '';
+            } else {
+                if (sleepEl) sleepEl.value = '';
+                if (hrvEl) hrvEl.value = '';
+                if (rhrEl) rhrEl.value = '';
+            }
+        }
+
+        function saveManualRecoveryLog() {
+            const dateStr = document.getElementById('rec-input-date')?.value || getLocalTodayDateString();
+            const rawSleep = document.getElementById('rec-input-sleep')?.value;
+            const rawHrv = document.getElementById('rec-input-hrv')?.value;
+            const rawRhr = document.getElementById('rec-input-rhr')?.value;
+
+            const sleepHours = rawSleep !== '' && !isNaN(parseFloat(rawSleep)) ? +parseFloat(rawSleep).toFixed(2) : null;
+            const hrv = rawHrv !== '' && !isNaN(parseFloat(rawHrv)) ? +parseFloat(rawHrv).toFixed(1) : null;
+            const restingHR = rawRhr !== '' && !isNaN(parseFloat(rawRhr)) ? +parseFloat(rawRhr).toFixed(1) : null;
+
+            if (sleepHours === null && hrv === null && restingHR === null) {
+                showToast('Enter at least one recovery value (Sleep, HRV, or RHR)', true);
+                return;
+            }
+
+            const existingIdx = recoveryLogs.findIndex(r => r.date === dateStr);
+            if (existingIdx > -1) {
+                if (sleepHours !== null) recoveryLogs[existingIdx].sleepHours = sleepHours;
+                if (hrv !== null) recoveryLogs[existingIdx].hrv = hrv;
+                if (restingHR !== null) recoveryLogs[existingIdx].restingHR = restingHR;
+                recoveryLogs[existingIdx].timestamp = Date.now();
+            } else {
+                recoveryLogs.push({
+                    id: `rec_${Date.now()}`,
+                    timestamp: Date.now(),
+                    date: dateStr,
+                    sleepHours,
+                    hrv,
+                    restingHR
+                });
+            }
+
+            saveToLocalStorage();
+            renderRecoveryPage();
+            showToast(`Saved recovery metrics for ${dateStr}`);
+        }
+
+        function renderRecoveryPage() {
+            if (recoveryDatePreset === 'all') {
+                const allDates = [
+                    ...workoutLogs.map(s => s.date),
+                    ...bodyweightLogs.map(b => b.date),
+                    ...recoveryLogs.map(r => r.date)
+                ];
+                if (allDates.length > 0) {
+                    const earliest = allDates.reduce((min, d) => d < min ? d : min, allDates[0]);
+                    const startEl = document.getElementById('recovery-start-date');
+                    if (startEl) startEl.value = earliest;
+                }
+            }
+
+            const startStr = document.getElementById('recovery-start-date')?.value || '1970-01-01';
+            const endStr = document.getElementById('recovery-end-date')?.value || getLocalTodayDateString();
+            const rangeStart = startStr <= endStr ? startStr : endStr;
+            const rangeEnd = endStr >= startStr ? endStr : startStr;
+
+            const metricA = document.getElementById('recovery-metric-a')?.value || 'hrv';
+            const metricB = document.getElementById('recovery-metric-b')?.value || 'volume';
+            const selectedEx = document.getElementById('recovery-exercise-filter')?.value || '__ALL__';
+
+            const trainingMetrics = ['volume', 'sets', 'progressionPct'];
+            const filterRow = document.getElementById('recovery-lift-filter-row');
+            if (filterRow) {
+                if (trainingMetrics.includes(metricA) || trainingMetrics.includes(metricB)) {
+                    filterRow.classList.remove('hidden');
+                } else {
+                    filterRow.classList.add('hidden');
+                }
+            }
+
+            // Summary averages for Sleep, HRV, and Resting HR in range
+            const recInRange = recoveryLogs.filter(r => r.date >= rangeStart && r.date <= rangeEnd);
+            const sleepVals = recInRange.map(r => r.sleepHours).filter(v => v !== null && v !== undefined && v > 0);
+            const hrvVals = recInRange.map(r => r.hrv).filter(v => v !== null && v !== undefined && v > 0);
+            const rhrVals = recInRange.map(r => r.restingHR).filter(v => v !== null && v !== undefined && v > 0);
+
+            const avgSleep = sleepVals.length > 0 ? (sleepVals.reduce((a, b) => a + b, 0) / sleepVals.length).toFixed(2) : null;
+            const avgHrv = hrvVals.length > 0 ? Math.round(hrvVals.reduce((a, b) => a + b, 0) / hrvVals.length) : null;
+            const avgRhr = rhrVals.length > 0 ? (rhrVals.reduce((a, b) => a + b, 0) / rhrVals.length).toFixed(1) : null;
+
+            document.getElementById('rec-stat-sleep').textContent = avgSleep ? `${avgSleep} hrs` : '—';
+            document.getElementById('rec-stat-sleep-sub').textContent = `${sleepVals.length} nights logged`;
+            document.getElementById('rec-stat-hrv').textContent = avgHrv ? `${avgHrv} ms` : '—';
+            document.getElementById('rec-stat-hrv-sub').textContent = `${hrvVals.length} nights logged`;
+            document.getElementById('rec-stat-rhr').textContent = avgRhr ? `${avgRhr} bpm` : '—';
+            document.getElementById('rec-stat-rhr-sub').textContent = `${rhrVals.length} nights logged`;
+
+            // Aggregate workout, bodyweight, and recovery data into buckets
+            const logsInRange = workoutLogs.filter(s => s.date >= rangeStart && s.date <= rangeEnd);
+            const filteredWorkouts = selectedEx === '__ALL__'
+                ? logsInRange
+                : logsInRange.filter(s => s.exercise === selectedEx);
+            const bwInRange = bodyweightLogs
+                .filter(b => b.date >= rangeStart && b.date <= rangeEnd)
+                .sort((a, b) => a.date.localeCompare(b.date));
+
+            const bucketsMap = {};
+            const ensureBucket = (bKey) => {
+                if (!bucketsMap[bKey]) {
+                    bucketsMap[bKey] = {
+                        volume: 0,
+                        sets: 0,
+                        max1RMByEx: {},
+                        best1RM: 0,
+                        sleepList: [],
+                        hrvList: [],
+                        rhrList: [],
+                        bwList: []
+                    };
+                }
+                return bucketsMap[bKey];
+            };
+
+            filteredWorkouts.forEach(s => {
+                const b = ensureBucket(getRecoveryBucketKey(s.date, recoveryInterval));
+                b.volume += s.volume || 0;
+                b.sets += 1;
+                if (s.e1rm > b.best1RM) b.best1RM = s.e1rm;
+                if (!b.max1RMByEx[s.exercise] || s.e1rm > b.max1RMByEx[s.exercise]) {
+                    b.max1RMByEx[s.exercise] = s.e1rm;
+                }
+            });
+
+            recInRange.forEach(r => {
+                const b = ensureBucket(getRecoveryBucketKey(r.date, recoveryInterval));
+                if (r.sleepHours !== null && r.sleepHours !== undefined && r.sleepHours > 0) b.sleepList.push(r.sleepHours);
+                if (r.hrv !== null && r.hrv !== undefined && r.hrv > 0) b.hrvList.push(r.hrv);
+                if (r.restingHR !== null && r.restingHR !== undefined && r.restingHR > 0) b.rhrList.push(r.restingHR);
+            });
+
+            bwInRange.forEach(bw => {
+                const b = ensureBucket(getRecoveryBucketKey(bw.date, recoveryInterval));
+                if (bw.weight > 0) b.bwList.push(bw.weight);
+            });
+
+            const sortedKeys = Object.keys(bucketsMap).sort();
+
+            // Baselines for progressionPct and bodyweightPct
+            const baseline1RMByEx = {};
+            let baselineSingle1RM = null;
+            let baselineBw = null;
+
+            sortedKeys.forEach(k => {
+                const b = bucketsMap[k];
+                Object.keys(b.max1RMByEx).forEach(exName => {
+                    if (baseline1RMByEx[exName] === undefined && b.max1RMByEx[exName] > 0) {
+                        baseline1RMByEx[exName] = b.max1RMByEx[exName];
+                    }
+                });
+                if (baselineSingle1RM === null && b.best1RM > 0) {
+                    baselineSingle1RM = b.best1RM;
+                }
+                if (baselineBw === null && b.bwList.length > 0) {
+                    baselineBw = b.bwList[b.bwList.length - 1];
+                }
+            });
+
+            const labels = [];
+            const seriesByMetric = {
+                sleepHours: [],
+                hrv: [],
+                restingHR: [],
+                volume: [],
+                sets: [],
+                progressionPct: [],
+                bodyweight: [],
+                bodyweightPct: []
+            };
+
+            let lastKnownBw = baselineBw;
+
+            sortedKeys.forEach(k => {
+                const b = bucketsMap[k];
+                labels.push(recoveryInterval === 'monthly' ? k : k.slice(5));
+
+                const avgArr = (arr, dec = 1) => arr.length > 0 ? +(arr.reduce((x, y) => x + y, 0) / arr.length).toFixed(dec) : null;
+
+                seriesByMetric.sleepHours.push(avgArr(b.sleepList, 2));
+                seriesByMetric.hrv.push(avgArr(b.hrvList, 1));
+                seriesByMetric.restingHR.push(avgArr(b.rhrList, 1));
+                seriesByMetric.volume.push(b.volume > 0 ? Math.round(b.volume) : 0);
+                seriesByMetric.sets.push(b.sets);
+
+                if (b.bwList.length > 0) {
+                    lastKnownBw = avgArr(b.bwList, 1);
+                }
+                seriesByMetric.bodyweight.push(lastKnownBw);
+                seriesByMetric.bodyweightPct.push(
+                    lastKnownBw && baselineBw ? +(((lastKnownBw - baselineBw) / baselineBw) * 100).toFixed(2) : null
+                );
+
+                if (selectedEx === '__ALL__') {
+                    const exNames = Object.keys(b.max1RMByEx);
+                    if (exNames.length > 0) {
+                        const pcts = exNames.map(exName => {
+                            const base = baseline1RMByEx[exName] || b.max1RMByEx[exName];
+                            return base > 0 ? ((b.max1RMByEx[exName] - base) / base) * 100 : 0;
+                        });
+                        seriesByMetric.progressionPct.push(+(pcts.reduce((x, y) => x + y, 0) / pcts.length).toFixed(2));
+                    } else {
+                        seriesByMetric.progressionPct.push(null);
+                    }
+                } else {
+                    if (b.best1RM > 0 && baselineSingle1RM > 0) {
+                        seriesByMetric.progressionPct.push(+(((b.best1RM - baselineSingle1RM) / baselineSingle1RM) * 100).toFixed(2));
+                    } else {
+                        seriesByMetric.progressionPct.push(null);
+                    }
+                }
+            });
+
+            renderRecoveryCorrelationChart(labels, seriesByMetric, metricA, metricB);
+        }
+
+        function renderRecoveryCorrelationChart(labels, seriesByMetric, metricA, metricB) {
+            const canvas = document.getElementById('recoveryCorrelationChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (recoveryChartInstance) {
+                recoveryChartInstance.destroy();
+            }
+
+            const metaA = CORRELATION_METRICS_META[metricA] || CORRELATION_METRICS_META.hrv;
+            const hasB = metricB && metricB !== 'none' && CORRELATION_METRICS_META[metricB];
+            const metaB = hasB ? CORRELATION_METRICS_META[metricB] : null;
+
+            const datasets = [];
+
+            // Primary Metric A (rendered as smooth line on Left Y-axis)
+            datasets.push({
+                type: 'line',
+                label: metaA.label,
+                data: seriesByMetric[metricA] || [],
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.14)',
+                borderWidth: 2.5,
+                pointRadius: 3,
+                tension: 0.3,
+                spanGaps: true,
+                yAxisID: 'y'
+            });
+
+            if (hasB) {
+                const isBarPreferred = metaB.defaultChartType === 'bar';
+                datasets.push({
+                    type: isBarPreferred ? 'bar' : 'line',
+                    label: metaB.label,
+                    data: seriesByMetric[metricB] || [],
+                    borderColor: '#38bdf8',
+                    backgroundColor: isBarPreferred ? 'rgba(56, 189, 248, 0.25)' : 'rgba(56, 189, 248, 0.14)',
+                    borderWidth: isBarPreferred ? 1 : 2.5,
+                    borderRadius: isBarPreferred ? 4 : 0,
+                    pointRadius: isBarPreferred ? 0 : 3,
+                    tension: 0.3,
+                    spanGaps: true,
+                    yAxisID: 'y1'
+                });
+            }
+
+            recoveryChartInstance = new Chart(ctx, {
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#d1d5db', font: { size: 10, family: 'Inter' }, boxWidth: 12 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#6b7280', font: { size: 10, family: 'JetBrains Mono' }, maxRotation: 45 },
+                            grid: { color: 'rgba(31, 41, 55, 0.5)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            ticks: { color: '#10b981', font: { size: 10, family: 'JetBrains Mono' } },
+                            grid: { color: 'rgba(31, 41, 55, 0.6)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            display: Boolean(hasB),
+                            ticks: { color: '#38bdf8', font: { size: 10, family: 'JetBrains Mono' } },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        /**************************************************************
          * 9. WORKOUT HISTORY, BACKUP & 18-MONTH DEMO DATA
          **************************************************************/
         function updateStorageSummary() {
             const el = document.getElementById('storage-summary');
             if (el) {
-                el.textContent = `${workoutLogs.length} total sets • ${bodyweightLogs.length} weigh-ins`;
+                el.textContent = `${workoutLogs.length} sets • ${bodyweightLogs.length} weigh-ins • ${recoveryLogs.length} recovery logs`;
             }
         }
 
@@ -3493,6 +4184,7 @@
                 workoutLogs,
                 exercises,
                 bodyweightLogs,
+                recoveryLogs,
                 heatTierThresholds,
                 garminExerciseMap,
                 garminConfig
@@ -3541,15 +4233,17 @@
                     if (Array.isArray(data.workoutLogs)) workoutLogs = data.workoutLogs;
                     if (Array.isArray(data.exercises)) exercises = normalizeExercisesList(data.exercises);
                     if (Array.isArray(data.bodyweightLogs)) bodyweightLogs = data.bodyweightLogs;
+                    if (Array.isArray(data.recoveryLogs)) recoveryLogs = data.recoveryLogs;
                     if (data.heatTierThresholds) heatTierThresholds = normalizeHeatTiers(data.heatTierThresholds);
                     if (data.garminExerciseMap) garminExerciseMap = { ...DEFAULT_GARMIN_EXERCISE_MAP, ...data.garminExerciseMap };
 
                     saveToLocalStorage();
                     populateExerciseSelect();
+                    populateRecoveryInputForDate();
                     onDateOrExerciseChange();
                     renderStatusPage();
                     renderHistoryList();
-                    showToast(`Imported ${workoutLogs.length} sets & configurations`);
+                    showToast(`Imported ${workoutLogs.length} sets & recovery logs`);
                 } catch (err) {
                     showToast('Invalid JSON backup file', true);
                 }
@@ -3569,17 +4263,19 @@
         function confirmClearExerciseDataOnly() {
             workoutLogs = [];
             bodyweightLogs = [];
+            recoveryLogs = [];
             saveToLocalStorage();
             closeConfirmClearModal();
             onDateOrExerciseChange();
             renderStatusPage();
             renderHistoryList();
-            showToast('Cleared workout sets & weigh-ins (kept configs)');
+            showToast('Cleared workout sets, weigh-ins & recovery logs (kept configs)');
         }
 
         function confirmClearAllData() {
             workoutLogs = [];
             bodyweightLogs = [];
+            recoveryLogs = [];
             exercises = JSON.parse(JSON.stringify(DEFAULT_EXERCISES));
             // Per user requirement: garminExerciseMap and heatTierThresholds are NEVER cleared
             saveToLocalStorage();
@@ -3595,6 +4291,7 @@
             const today = new Date();
             const demoSets = [];
             const demoBw = [];
+            const demoRec = [];
             const totalWeeks = 78; // 18 Months
 
             const baseWeights = {
@@ -3676,6 +4373,27 @@
                     weight: bwVal
                 });
 
+                // Generate realistic daily sleep, HRV, and resting HR across each week
+                for (let d = 0; d < 7; d++) {
+                    const dayObj = new Date(weekStart.getTime() + d * 86400000);
+                    if (dayObj > today) continue;
+                    const recDateStr = formatLocalDate(dayObj);
+                    const isTrainingDay = [2, 3, 4, 5, 6].includes(d);
+                    const sleepWave = Math.sin(w * 0.5 + d) * 0.55;
+                    const sleepHrs = +(7.3 + (isDeload ? 0.4 : 0) + sleepWave).toFixed(2);
+                    const hrvVal = Math.round(64 + progressRatio * 8 + (isDeload ? 5 : (isTrainingDay ? -2 : 3)) + Math.sin(w * 0.7 + d) * 6);
+                    const rhrVal = +(54 - progressRatio * 3 - (isDeload ? 1.5 : (isTrainingDay ? -0.8 : 0.5)) - Math.sin(w * 0.5 + d) * 1.8).toFixed(1);
+
+                    demoRec.push({
+                        id: `demo_rec_${w}_${d}`,
+                        timestamp: dayObj.getTime(),
+                        date: recDateStr,
+                        sleepHours: sleepHrs,
+                        hrv: hrvVal,
+                        restingHR: rhrVal
+                    });
+                }
+
                 weeklySchedule.forEach(dayPlan => {
                     const sessionDateObj = new Date(weekStart.getTime() + dayPlan.dayOffset * 86400000);
                     if (sessionDateObj > today) return;
@@ -3712,11 +4430,14 @@
 
             workoutLogs = demoSets;
             bodyweightLogs = demoBw;
+            recoveryLogs = demoRec;
             saveToLocalStorage();
+            populateRecoveryInputForDate();
             onDateOrExerciseChange();
             renderStatusPage();
             renderHistoryList();
-            showToast(`Loaded 18M Demo (${demoSets.length} sets & ${demoBw.length} weigh-ins)`);
+            if (!document.getElementById('tab-recovery').classList.contains('hidden')) renderRecoveryPage();
+            showToast(`Loaded 18M Demo (${demoSets.length} sets & ${demoRec.length} recovery nights)`);
         }
 
         function showToast(message, isError = false) {
