@@ -366,6 +366,63 @@
                 <div id="muscle-volume-grid" class="grid grid-cols-2 gap-2"></div>
             </div>
 
+            <!-- Training Sets by Muscle Trend Chart Card -->
+            <div class="bg-surface-900 border border-gray-800/90 rounded-2xl p-4 shadow-lg space-y-3.5">
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <h3 class="text-sm font-extrabold uppercase tracking-wider text-white flex items-center gap-1.5">
+                            <i class="fa-solid fa-chart-column text-brand-400"></i> Training Sets by Muscle
+                        </h3>
+                        <p id="muscle-trend-subtitle" class="text-[11px] text-gray-400 mt-0.5">Fractional sets per week (Primary = 1.0 • Secondary = 0.5)</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span id="muscle-trend-total" class="font-mono text-sm font-extrabold text-brand-400 block">0 sets</span>
+                        <span id="muscle-trend-avg" class="text-[10px] text-gray-400 block">0 /wk avg</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Muscle Group</label>
+                    <select id="muscle-trend-select" onchange="renderMuscleSetsChart()" class="w-full bg-surface-950 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-brand-500 transition"></select>
+                </div>
+
+                <div class="pt-2 border-t border-gray-800/80 space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Date Range</span>
+                        <div class="flex bg-surface-950 p-1 rounded-xl border border-gray-800 gap-1">
+                            <button type="button" id="mt-range-btn-4w" onclick="setMuscleTrendDatePreset('4w')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">4W</button>
+                            <button type="button" id="mt-range-btn-12w" onclick="setMuscleTrendDatePreset('12w')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition">12W</button>
+                            <button type="button" id="mt-range-btn-12m" onclick="setMuscleTrendDatePreset('12m')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">12M</button>
+                            <button type="button" id="mt-range-btn-all" onclick="setMuscleTrendDatePreset('all')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">All Time</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">Start Date</label>
+                            <input type="date" id="muscle-trend-start-date" onchange="onCustomMuscleTrendDateChange()" class="w-full bg-surface-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-gray-400 mb-1">End Date</label>
+                            <input type="date" id="muscle-trend-end-date" onchange="onCustomMuscleTrendDateChange()" class="w-full bg-surface-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-brand-500">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Aggregation Interval</span>
+                        <div class="flex bg-surface-950 p-1 rounded-xl border border-gray-800 gap-1">
+                            <button type="button" id="mt-int-btn-daily" onclick="setMuscleTrendInterval('daily')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">Daily</button>
+                            <button type="button" id="mt-int-btn-weekly" onclick="setMuscleTrendInterval('weekly')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition">Weekly</button>
+                            <button type="button" id="mt-int-btn-monthly" onclick="setMuscleTrendInterval('monthly')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">Monthly</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative h-56 w-full pt-1">
+                    <canvas id="muscleSetsChart"></canvas>
+                </div>
+            </div>
+
             <!-- Exercise Muscle Configuration Table Card -->
             <div class="bg-surface-900 border border-gray-800/90 rounded-2xl p-4 shadow-lg space-y-3">
                 <div class="flex items-center justify-between">
@@ -563,16 +620,29 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Exercise Scope</label>
-                    <select id="analytics-exercise-select" onchange="onAnalyticsExerciseChange()" class="w-full bg-surface-950 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-brand-500 transition"></select>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Training Scope</label>
+                    <div class="relative" data-scope-wrap="analytics">
+                        <button type="button" id="analytics-scope-btn" onclick="toggleScopePanel('analytics')" class="w-full flex items-center justify-between gap-2 bg-surface-950 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-brand-500 transition">
+                            <span id="analytics-scope-label" class="truncate">All exercises</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 shrink-0"></i>
+                        </button>
+                        <div id="analytics-scope-panel" class="hidden absolute left-0 right-0 mt-1 z-20 bg-surface-900 border border-gray-700 rounded-xl shadow-2xl p-2 space-y-1.5">
+                            <div class="flex items-center justify-between gap-1.5 pb-1.5 border-b border-gray-800">
+                                <button type="button" onclick="setScopeAll('analytics', true)" class="flex-1 px-2 py-1 rounded-lg bg-surface-800 hover:bg-gray-700 text-[11px] font-bold text-brand-400 transition">Select all</button>
+                                <button type="button" onclick="setScopeAll('analytics', false)" class="flex-1 px-2 py-1 rounded-lg bg-surface-800 hover:bg-gray-700 text-[11px] font-bold text-gray-300 transition">Deselect all</button>
+                            </div>
+                            <div id="analytics-scope-list" class="max-h-64 overflow-y-auto space-y-0.5 pr-1"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="pt-2 border-t border-gray-800/80 space-y-2.5">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Date Range</span>
                         <div class="flex bg-surface-950 p-1 rounded-xl border border-gray-800 gap-1">
-                            <button type="button" id="range-btn-12w" onclick="setAnalyticsDatePreset('12w')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">12 Weeks</button>
-                            <button type="button" id="range-btn-12m" onclick="setAnalyticsDatePreset('12m')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition">12 Months</button>
+                            <button type="button" id="range-btn-4w" onclick="setAnalyticsDatePreset('4w')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">4W</button>
+                            <button type="button" id="range-btn-12w" onclick="setAnalyticsDatePreset('12w')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">12W</button>
+                            <button type="button" id="range-btn-12m" onclick="setAnalyticsDatePreset('12m')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition">12M</button>
                             <button type="button" id="range-btn-all" onclick="setAnalyticsDatePreset('all')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">All Time</button>
                         </div>
                     </div>
@@ -589,10 +659,19 @@
                     </div>
 
                     <div class="flex items-center justify-between pt-1">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Volume Grouping</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Aggregation Interval</span>
                         <div class="flex bg-surface-950 p-1 rounded-xl border border-gray-800 gap-1">
-                            <button type="button" id="interval-btn-weekly" onclick="setAnalyticsInterval('weekly')" class="px-3 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition">Weekly</button>
-                            <button type="button" id="interval-btn-monthly" onclick="setAnalyticsInterval('monthly')" class="px-3 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">Monthly</button>
+                            <button type="button" id="interval-btn-daily" onclick="setAnalyticsInterval('daily')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">Daily</button>
+                            <button type="button" id="interval-btn-weekly" onclick="setAnalyticsInterval('weekly')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition">Weekly</button>
+                            <button type="button" id="interval-btn-monthly" onclick="setAnalyticsInterval('monthly')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">Monthly</button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Volume Metric</span>
+                        <div class="flex bg-surface-950 p-1 rounded-xl border border-gray-800 gap-1">
+                            <button type="button" id="volmetric-btn-tonnage" onclick="setAnalyticsVolumeMetric('tonnage')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition">Tonnage (kg)</button>
+                            <button type="button" id="volmetric-btn-e1rm" onclick="setAnalyticsVolumeMetric('e1rm')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition">Training Volume (1RM)</button>
                         </div>
                     </div>
                 </div>
@@ -610,12 +689,12 @@
                         <span id="stat-best-1rm-sub" class="text-[10px] text-gray-500">vs range baseline</span>
                     </div>
                     <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400 block">Peak Interval Vol</span>
+                        <span id="stat-card3-label" class="text-[10px] font-bold uppercase tracking-wider text-sky-400 block">Peak Interval Vol</span>
                         <span id="stat-max-vol" class="font-mono text-base font-extrabold text-white mt-0.5 block">—</span>
                         <span id="stat-max-vol-sub" class="text-[10px] text-gray-500">Best week</span>
                     </div>
                     <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 block">Total Tonnage</span>
+                        <span id="stat-card4-label" class="text-[10px] font-bold uppercase tracking-wider text-amber-400 block">Total Tonnage</span>
                         <span id="stat-cum-vol" class="font-mono text-base font-extrabold text-white mt-0.5 block">—</span>
                         <span id="stat-cum-sets" class="text-[10px] text-gray-500">0 total sets</span>
                     </div>
@@ -689,7 +768,7 @@
                         <h2 class="text-sm font-extrabold uppercase tracking-wider text-white flex items-center gap-2">
                             <i class="fa-solid fa-heart-pulse text-rose-400"></i> Recovery & Correlation Lab
                         </h2>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Compare any 2 Sleep, HRV, RHR, Steps, Calories, or Strength metrics</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Compare any 2 Sleep, HRV, RHR, Steps, Calories, Stress, or Strength metrics</p>
                     </div>
                     <span class="text-[10px] font-mono text-sky-400 bg-sky-500/10 border border-sky-500/30 px-2 py-0.5 rounded-lg">Garmin + Manual</span>
                 </div>
@@ -727,7 +806,7 @@
                 </div>
 
                 <!-- Summary Averages in Selected Range -->
-                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
                     <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400 block">Avg Sleep</span>
                         <span id="rec-stat-sleep" class="font-mono text-sm font-extrabold text-white mt-0.5 block">—</span>
@@ -748,10 +827,15 @@
                         <span id="rec-stat-steps" class="font-mono text-sm font-extrabold text-white mt-0.5 block">—</span>
                         <span id="rec-stat-steps-sub" class="text-[10px] text-gray-500">Daily steps</span>
                     </div>
-                    <div class="col-span-2 sm:col-span-1 bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
+                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-orange-400 block">Active Cal</span>
                         <span id="rec-stat-cal" class="font-mono text-sm font-extrabold text-white mt-0.5 block">—</span>
                         <span id="rec-stat-cal-sub" class="text-[10px] text-gray-500">Daily kcal</span>
+                    </div>
+                    <div class="bg-surface-950 border border-gray-800/80 rounded-xl p-2.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-yellow-400 block">Avg Stress</span>
+                        <span id="rec-stat-stress" class="font-mono text-sm font-extrabold text-white mt-0.5 block">—</span>
+                        <span id="rec-stat-stress-sub" class="text-[10px] text-gray-500">Daily 0–100</span>
                     </div>
                 </div>
             </div>
@@ -769,7 +853,9 @@
                             <option value="restingHR">Night Resting HR (bpm)</option>
                             <option value="steps">Daily Step Count (steps)</option>
                             <option value="activeCalories">Active Calories Burned (kcal)</option>
+                            <option value="stress">Avg Stress Level (0–100)</option>
                             <option value="volume">Training Volume (kg)</option>
+                            <option value="volume1rm">Training Volume (1RM)</option>
                             <option value="sets">Training Sets (count)</option>
                             <option value="progressionPct">Strength Progression (% Gain)</option>
                             <option value="bodyweight">Bodyweight (kg)</option>
@@ -788,7 +874,9 @@
                             <option value="restingHR">Night Resting HR (bpm)</option>
                             <option value="steps">Daily Step Count (steps)</option>
                             <option value="activeCalories">Active Calories Burned (kcal)</option>
+                            <option value="stress">Avg Stress Level (0–100)</option>
                             <option value="volume" selected>Training Volume (kg)</option>
+                            <option value="volume1rm">Training Volume (1RM)</option>
                             <option value="sets">Training Sets (count)</option>
                             <option value="progressionPct">Strength Progression (% Gain)</option>
                             <option value="bodyweight">Bodyweight (kg)</option>
@@ -799,8 +887,22 @@
 
                 <!-- Optional Lift Filter when Progression %, Volume, or Sets is chosen -->
                 <div id="recovery-lift-filter-row" class="bg-surface-950/90 border border-gray-800 rounded-xl px-3 py-2 flex items-center justify-between gap-2">
-                    <span class="text-[11px] font-bold text-gray-400">Training Metric Scope:</span>
-                    <select id="recovery-exercise-filter" onchange="renderRecoveryPage()" class="bg-surface-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs font-bold text-white focus:outline-none focus:border-brand-500 max-w-[210px]"></select>
+                    <span class="text-[11px] font-bold text-gray-400 shrink-0">Training Scope:</span>
+                    <div class="flex-1 min-w-0 max-w-[230px]">
+                    <div class="relative" data-scope-wrap="recovery">
+                        <button type="button" id="recovery-scope-btn" onclick="toggleScopePanel('recovery')" class="w-full flex items-center justify-between gap-2 bg-surface-900 border border-gray-700 rounded-lg px-2.5 py-1 text-xs font-bold text-white focus:outline-none focus:border-brand-500">
+                            <span id="recovery-scope-label" class="truncate">All exercises</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 shrink-0"></i>
+                        </button>
+                        <div id="recovery-scope-panel" class="hidden absolute right-0 w-64 mt-1 z-20 bg-surface-900 border border-gray-700 rounded-xl shadow-2xl p-2 space-y-1.5">
+                            <div class="flex items-center justify-between gap-1.5 pb-1.5 border-b border-gray-800">
+                                <button type="button" onclick="setScopeAll('recovery', true)" class="flex-1 px-2 py-1 rounded-lg bg-surface-800 hover:bg-gray-700 text-[11px] font-bold text-brand-400 transition">Select all</button>
+                                <button type="button" onclick="setScopeAll('recovery', false)" class="flex-1 px-2 py-1 rounded-lg bg-surface-800 hover:bg-gray-700 text-[11px] font-bold text-gray-300 transition">Deselect all</button>
+                            </div>
+                            <div id="recovery-scope-list" class="max-h-64 overflow-y-auto space-y-0.5 pr-1"></div>
+                        </div>
+                    </div>
+                    </div>
                 </div>
 
                 <!-- Quick 1-Tap Comparison Presets -->
@@ -854,6 +956,10 @@
                         <label class="block text-[10px] font-bold uppercase text-orange-400 mb-1">Active Cal (kcal)</label>
                         <input type="number" id="rec-input-cal" step="10" min="0" max="15000" placeholder="620" class="w-full bg-surface-950 border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-orange-400">
                     </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-yellow-400 mb-1">Avg Stress (0–100)</label>
+                        <input type="number" id="rec-input-stress" step="1" min="0" max="100" placeholder="32" class="w-full bg-surface-950 border border-gray-700 rounded-xl px-2.5 py-2 text-xs font-mono font-bold text-white focus:outline-none focus:border-yellow-400">
+                    </div>
                 </div>
 
                 <button type="button" onclick="saveManualRecoveryLog()" class="w-full py-2.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 font-extrabold text-xs uppercase tracking-wider transition flex items-center justify-center gap-1.5">
@@ -874,7 +980,7 @@
                         <h2 class="text-sm font-extrabold uppercase tracking-wider text-white flex items-center gap-2">
                             <i class="fa-solid fa-satellite-dish text-sky-400"></i> Garmin Cloud Sync (Hands-Free)
                         </h2>
-                        <p id="garmin-last-sync-label" class="text-[11px] text-gray-400 mt-0.5">Pulls watch sets, weigh-ins, sleep, RHR, HRV, steps & active calories</p>
+                        <p id="garmin-last-sync-label" class="text-[11px] text-gray-400 mt-0.5">Pulls watch sets, weigh-ins, sleep, RHR, HRV, steps, active calories & stress</p>
                     </div>
                     <button type="button" onclick="openGarminMapperModal()" class="px-2.5 py-1 rounded-xl bg-surface-800 hover:bg-gray-700 border border-gray-700 text-[11px] font-bold text-sky-300 transition flex items-center gap-1">
                         <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Lift Mapper
@@ -904,13 +1010,6 @@
                         </div>
                     </details>
 
-                    <div class="flex items-center justify-between pt-1">
-                        <label class="flex items-center gap-2 cursor-pointer select-none text-xs text-gray-300">
-                            <input type="checkbox" id="garmin-autosync-toggle" onchange="saveGarminSyncSettings()" checked class="accent-sky-400 w-4 h-4 rounded">
-                            <span>Auto-pull Gist when IronPulse opens</span>
-                        </label>
-                    </div>
-
                     <!-- Garmin Import Date Range Filter -->
                     <div class="pt-2.5 border-t border-gray-800/80 space-y-2">
                         <div class="flex flex-wrap items-center justify-between gap-2">
@@ -933,10 +1032,6 @@
                                 <input type="date" id="garmin-sync-end-date" onchange="onGarminSyncDateChange()" class="w-full bg-surface-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-sky-400">
                             </div>
                         </div>
-                        <label class="flex items-center gap-2 cursor-pointer select-none text-[11px] text-gray-400 pt-0.5">
-                            <input type="checkbox" id="garmin-strict-range-toggle" onchange="saveGarminSyncSettings()" checked class="accent-sky-400 w-3.5 h-3.5 rounded">
-                            <span>Remove previously synced Garmin sets outside this date range</span>
-                        </label>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2 pt-1">
@@ -1342,7 +1437,7 @@
             gistId: '',
             ghToken: '',
             ghRepo: '',
-            autoSync: true,
+            autoSync: false,
             strictRange: true,
             lastSyncedAt: null,
             syncPreset: '30d',
@@ -1357,6 +1452,12 @@
         let recoveryDatePreset = '12w';
         let recoveryInterval = 'weekly';
         let statusDatePreset = '4w';
+        let analyticsVolumeMetric = 'tonnage';
+        let muscleTrendDatePreset = '12w';
+        let muscleTrendInterval = 'weekly';
+        let muscleSetsChartInstance = null;
+        // Training scope: exercises the user has deselected (new exercises are included by default)
+        const scopeExcluded = { analytics: new Set(), recovery: new Set() };
         let progressionChartInstance = null;
         let recoveryChartInstance = null;
         let selectedDiagramMuscle = null;
@@ -1382,6 +1483,8 @@
             populateExerciseSelect();
             populateGarminSyncInputsUI();
             setStatusDatePreset('4w', false);
+            populateMuscleTrendSelect();
+            setMuscleTrendDatePreset('12w', false);
             setAnalyticsDatePreset('12m', false);
             setRecoveryDatePreset('12w', false);
             populateRecoveryInputForDate();
@@ -1392,9 +1495,15 @@
             renderStatusPage();
             switchTab('status');
 
-            if (garminConfig.autoSync && garminConfig.gistId) {
-                syncFromGarminGist(true);
-            }
+            // Close any open Training Scope dropdown when tapping outside it
+            document.addEventListener('click', (e) => {
+                if (!e.target.isConnected) return;
+                document.querySelectorAll('[data-scope-wrap]').forEach(wrap => {
+                    if (!wrap.contains(e.target)) {
+                        document.getElementById(`${wrap.dataset.scopeWrap}-scope-panel`)?.classList.add('hidden');
+                    }
+                });
+            });
         });
 
         function formatLocalDate(dateObj) {
@@ -1587,15 +1696,11 @@
             const gistInput = document.getElementById('garmin-gist-id');
             const tokenInput = document.getElementById('garmin-gh-token');
             const repoInput = document.getElementById('garmin-gh-repo');
-            const autoToggle = document.getElementById('garmin-autosync-toggle');
-            const strictToggle = document.getElementById('garmin-strict-range-toggle');
             const statusLabel = document.getElementById('garmin-last-sync-label');
 
             if (gistInput) gistInput.value = garminConfig.gistId || '';
             if (tokenInput) tokenInput.value = garminConfig.ghToken || '';
             if (repoInput) repoInput.value = garminConfig.ghRepo || '';
-            if (autoToggle) autoToggle.checked = garminConfig.autoSync !== false;
-            if (strictToggle) strictToggle.checked = garminConfig.strictRange !== false;
 
             const todayStr = getLocalTodayDateString();
             if (!garminConfig.syncEndDate) {
@@ -1667,16 +1772,14 @@
             const gistVal = (document.getElementById('garmin-gist-id')?.value || '').trim();
             const tokenVal = (document.getElementById('garmin-gh-token')?.value || '').trim();
             const repoVal = (document.getElementById('garmin-gh-repo')?.value || '').trim();
-            const autoVal = document.getElementById('garmin-autosync-toggle')?.checked ?? true;
-            const strictVal = document.getElementById('garmin-strict-range-toggle')?.checked ?? true;
             const startVal = document.getElementById('garmin-sync-start-date')?.value || garminConfig.syncStartDate || '';
             const endVal = document.getElementById('garmin-sync-end-date')?.value || garminConfig.syncEndDate || '';
 
             garminConfig.gistId = gistVal;
             garminConfig.ghToken = tokenVal;
             garminConfig.ghRepo = repoVal;
-            garminConfig.autoSync = autoVal;
-            garminConfig.strictRange = strictVal;
+            garminConfig.autoSync = false;
+            garminConfig.strictRange = false;
             garminConfig.syncStartDate = startVal;
             garminConfig.syncEndDate = endVal;
             saveToLocalStorage();
@@ -1821,33 +1924,6 @@
         }
 
         function finalizeGarminDataImport(incomingSets, incomingBw, incomingRec = [], filterStart, filterEnd, syncedTimestamp, isSilentStartup = false) {
-            // If strictRange is enabled, prune previously synced Garmin sets, weigh-ins & recovery logs outside [filterStart, filterEnd]
-            let removedOutOfRange = 0;
-            if (garminConfig.strictRange !== false && filterStart && filterEnd) {
-                const beforeCount = workoutLogs.length;
-                workoutLogs = workoutLogs.filter(s => {
-                    const isGarminSet = String(s.id || '').startsWith('garmin_') || Boolean(s.garminActivityId) || Boolean(s.rawGarminExercise);
-                    if (!isGarminSet) return true;
-                    const d = String(s.date || '').slice(0, 10);
-                    return d >= filterStart && d <= filterEnd;
-                });
-                removedOutOfRange = beforeCount - workoutLogs.length;
-
-                bodyweightLogs = bodyweightLogs.filter(b => {
-                    const isGarminBw = String(b.id || '').startsWith('garmin_bw_');
-                    if (!isGarminBw) return true;
-                    const d = String(b.date || '').slice(0, 10);
-                    return d >= filterStart && d <= filterEnd;
-                });
-
-                recoveryLogs = recoveryLogs.filter(r => {
-                    const isGarminRec = String(r.id || '').startsWith('garmin_rec_');
-                    if (!isGarminRec) return true;
-                    const d = String(r.date || '').slice(0, 10);
-                    return d >= filterStart && d <= filterEnd;
-                });
-            }
-
             const existingIds = new Set(workoutLogs.map(s => s.id));
             let addedSets = 0;
             let updatedSets = 0;
@@ -1926,8 +2002,9 @@
                 const hrvVal = recEntry.hrv !== null && recEntry.hrv !== undefined ? +parseFloat(recEntry.hrv).toFixed(1) : null;
                 const stepsVal = recEntry.steps !== null && recEntry.steps !== undefined ? Math.round(parseFloat(recEntry.steps)) : null;
                 const calVal = recEntry.activeCalories !== null && recEntry.activeCalories !== undefined ? Math.round(parseFloat(recEntry.activeCalories)) : null;
+                const stressVal = recEntry.stress !== null && recEntry.stress !== undefined && parseFloat(recEntry.stress) > 0 ? Math.round(parseFloat(recEntry.stress)) : null;
 
-                if (sleepVal === null && rhrVal === null && hrvVal === null && stepsVal === null && calVal === null) return;
+                if (sleepVal === null && rhrVal === null && hrvVal === null && stepsVal === null && calVal === null && stressVal === null) return;
 
                 const existingIdx = recoveryLogs.findIndex(r => r.date === dStr);
                 if (existingIdx > -1) {
@@ -1936,6 +2013,7 @@
                     if (hrvVal !== null) recoveryLogs[existingIdx].hrv = hrvVal;
                     if (stepsVal !== null) recoveryLogs[existingIdx].steps = stepsVal;
                     if (calVal !== null) recoveryLogs[existingIdx].activeCalories = calVal;
+                    if (stressVal !== null) recoveryLogs[existingIdx].stress = stressVal;
                 } else {
                     recoveryLogs.push({
                         id: recEntry.id || `garmin_rec_${dStr}`,
@@ -1945,7 +2023,8 @@
                         restingHR: rhrVal,
                         hrv: hrvVal,
                         steps: stepsVal,
-                        activeCalories: calVal
+                        activeCalories: calVal,
+                        stress: stressVal
                     });
                 }
                 syncedRecCount++;
@@ -1968,10 +2047,9 @@
                 headerStatus.textContent = `Garmin Synced • ${workoutLogs.length} sets`;
             }
 
-            if (!isSilentStartup || addedSets > 0 || addedBw > 0 || syncedRecCount > 0 || removedOutOfRange > 0) {
+            if (!isSilentStartup || addedSets > 0 || addedBw > 0 || syncedRecCount > 0) {
                 const recText = syncedRecCount > 0 ? `, ${syncedRecCount} recovery` : '';
-                const prunedText = removedOutOfRange > 0 ? `, -${removedOutOfRange} pruned` : '';
-                showToast(`Garmin Sync: +${addedSets} sets, ${updatedSets} upd${recText}${prunedText}`);
+                showToast(`Garmin Sync: +${addedSets} sets, ${updatedSets} upd${recText}`);
             }
         }
 
@@ -2649,11 +2727,209 @@
             }
 
             renderExerciseMuscleConfigTable();
+            renderMuscleSetsChart();
         }
 
         function selectMuscleOnDiagram(muscleName) {
             selectedDiagramMuscle = (selectedDiagramMuscle === muscleName) ? null : muscleName;
+            const trendSel = document.getElementById('muscle-trend-select');
+            if (selectedDiagramMuscle && trendSel) trendSel.value = selectedDiagramMuscle;
             renderStatusPage();
+        }
+
+        /**************************************************************
+         * 3C. TRAINING SETS BY MUSCLE TREND CHART (STATUS PAGE)
+         **************************************************************/
+        function populateMuscleTrendSelect() {
+            const sel = document.getElementById('muscle-trend-select');
+            if (!sel) return;
+            const current = sel.value;
+            sel.innerHTML = MUSCLE_GROUPS.map(m => `<option value="${m}">${m}</option>`).join('');
+            sel.value = MUSCLE_GROUPS.includes(current) ? current : MUSCLE_GROUPS[0];
+        }
+
+        function getEarliestWorkoutDate(fallbackStr) {
+            if (workoutLogs.length === 0) return fallbackStr;
+            return workoutLogs.reduce((min, s) => (s.date && s.date < min ? s.date : min), workoutLogs[0].date || fallbackStr);
+        }
+
+        function setMuscleTrendDatePreset(preset, shouldRender = true) {
+            muscleTrendDatePreset = preset;
+            const today = new Date();
+            const endStr = formatLocalDate(today);
+            const daysMap = { '4w': 28, '12w': 84, '12m': 365 };
+            let startStr;
+            if (daysMap[preset]) {
+                startStr = formatLocalDate(new Date(today.getTime() - daysMap[preset] * 86400000));
+            } else {
+                startStr = getEarliestWorkoutDate(formatLocalDate(new Date(today.getTime() - 84 * 86400000)));
+            }
+
+            const startEl = document.getElementById('muscle-trend-start-date');
+            const endEl = document.getElementById('muscle-trend-end-date');
+            if (startEl) startEl.value = startStr;
+            if (endEl) endEl.value = endStr;
+
+            updateMuscleTrendPresetButtonsUI();
+            if (shouldRender) renderMuscleSetsChart();
+        }
+
+        function onCustomMuscleTrendDateChange() {
+            muscleTrendDatePreset = 'custom';
+            updateMuscleTrendPresetButtonsUI();
+            renderMuscleSetsChart();
+        }
+
+        function updateMuscleTrendPresetButtonsUI() {
+            ['4w', '12w', '12m', 'all'].forEach(p => {
+                const btn = document.getElementById(`mt-range-btn-${p}`);
+                if (!btn) return;
+                btn.className = muscleTrendDatePreset === p ? 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition' : 'px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition';
+            });
+        }
+
+        function setMuscleTrendInterval(interval) {
+            muscleTrendInterval = interval;
+            ['daily', 'weekly', 'monthly'].forEach(i => {
+                const btn = document.getElementById(`mt-int-btn-${i}`);
+                if (!btn) return;
+                btn.className = muscleTrendInterval === i ? 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition' : 'px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition';
+            });
+            renderMuscleSetsChart();
+        }
+
+        // Every bucket key (day / week-start Monday / YYYY-MM) touched by the date range, including empty ones
+        function enumerateBucketKeys(startStr, endStr, intervalType) {
+            const keys = [];
+            const seen = new Set();
+            const [sy, sm, sd] = startStr.split('-').map(Number);
+            const [ey, em, ed] = endStr.split('-').map(Number);
+            const cur = new Date(sy, sm - 1, sd);
+            const end = new Date(ey, em - 1, ed);
+            while (cur <= end) {
+                const k = getIntervalBucketKey(formatLocalDate(cur), intervalType);
+                if (!seen.has(k)) {
+                    seen.add(k);
+                    keys.push(k);
+                }
+                cur.setDate(cur.getDate() + 1);
+            }
+            return keys;
+        }
+
+        function renderMuscleSetsChart() {
+            const canvas = document.getElementById('muscleSetsChart');
+            const sel = document.getElementById('muscle-trend-select');
+            if (!canvas || !sel) return;
+            const muscle = sel.value || MUSCLE_GROUPS[0];
+
+            if (muscleTrendDatePreset === 'all') {
+                const startEl = document.getElementById('muscle-trend-start-date');
+                if (startEl) startEl.value = getEarliestWorkoutDate(startEl.value || getLocalTodayDateString());
+            }
+
+            const todayStr = getLocalTodayDateString();
+            const startVal = document.getElementById('muscle-trend-start-date')?.value || todayStr;
+            const endVal = document.getElementById('muscle-trend-end-date')?.value || todayStr;
+            const rangeStart = startVal <= endVal ? startVal : endVal;
+            const rangeEnd = endVal >= startVal ? endVal : startVal;
+
+            const exMap = {};
+            exercises.forEach(ex => { exMap[ex.name] = ex; });
+
+            const bucketTotals = {};
+            workoutLogs.forEach(s => {
+                if (!s.date || s.date < rangeStart || s.date > rangeEnd) return;
+                const cfg = exMap[s.exercise];
+                if (!cfg) return;
+                const p1 = cfg.primaryMuscle;
+                const p2 = cfg.primaryMuscle2 || '';
+                let credit = 0;
+                if (muscle === p1 || (p2 && muscle === p2)) {
+                    credit = 1.0;
+                } else if (Array.isArray(cfg.secondaryMuscles) && cfg.secondaryMuscles.includes(muscle)) {
+                    credit = 0.5;
+                }
+                if (credit === 0) return;
+
+                const lat = cfg.laterality || 'bilateral';
+                const k = getIntervalBucketKey(s.date, muscleTrendInterval);
+                if (!bucketTotals[k]) bucketTotals[k] = { left: 0, right: 0 };
+                if (lat !== 'right') bucketTotals[k].left += credit;
+                if (lat !== 'left') bucketTotals[k].right += credit;
+            });
+
+            const keys = enumerateBucketKeys(rangeStart, rangeEnd, muscleTrendInterval);
+            const labels = keys.map(k => (muscleTrendInterval === 'monthly' ? k : k.slice(5)));
+            const leftData = keys.map(k => +((bucketTotals[k]?.left) || 0).toFixed(1));
+            const rightData = keys.map(k => +((bucketTotals[k]?.right) || 0).toFixed(1));
+            const isAsymmetric = leftData.some((v, i) => Math.abs(v - rightData[i]) > 0.001);
+
+            const unitWord = { daily: 'day', weekly: 'week', monthly: 'month' }[muscleTrendInterval];
+            const [sy, sm, sd] = rangeStart.split('-').map(Number);
+            const [ey, em, ed] = rangeEnd.split('-').map(Number);
+            const rangeDays = Math.max(1, Math.round((new Date(ey, em - 1, ed) - new Date(sy, sm - 1, sd)) / 86400000) + 1);
+            const rangeWeeks = rangeDays / 7;
+
+            const totalLeft = leftData.reduce((a, b) => a + b, 0);
+            const totalRight = rightData.reduce((a, b) => a + b, 0);
+            const totalEl = document.getElementById('muscle-trend-total');
+            const avgEl = document.getElementById('muscle-trend-avg');
+            const subEl = document.getElementById('muscle-trend-subtitle');
+            if (isAsymmetric) {
+                if (totalEl) totalEl.textContent = `L ${+totalLeft.toFixed(1)} • R ${+totalRight.toFixed(1)} sets`;
+                if (avgEl) avgEl.textContent = `L ${(totalLeft / rangeWeeks).toFixed(1)} • R ${(totalRight / rangeWeeks).toFixed(1)} /wk avg`;
+            } else {
+                if (totalEl) totalEl.textContent = `${+totalLeft.toFixed(1)} sets`;
+                if (avgEl) avgEl.textContent = `${(totalLeft / rangeWeeks).toFixed(1)} /wk avg`;
+            }
+            if (subEl) subEl.textContent = `${muscle}: fractional sets per ${unitWord} (${rangeStart} to ${rangeEnd})`;
+
+            const datasets = [];
+            if (isAsymmetric) {
+                datasets.push({ label: `${muscle} (Left)`, data: leftData, backgroundColor: 'rgba(16, 185, 129, 0.55)', borderColor: '#10b981', borderWidth: 1, borderRadius: 4 });
+                datasets.push({ label: `${muscle} (Right)`, data: rightData, backgroundColor: 'rgba(56, 189, 248, 0.55)', borderColor: '#38bdf8', borderWidth: 1, borderRadius: 4 });
+            } else {
+                // Weekly view: colour each bar by the same heat tiers used on the body map
+                const barColors = muscleTrendInterval === 'weekly'
+                    ? leftData.map(v => getMuscleHeatStyle(v).fill)
+                    : leftData.map(() => '#10b981');
+                datasets.push({ label: `${muscle} sets`, data: leftData, backgroundColor: barColors, borderWidth: 0, borderRadius: 4 });
+            }
+
+            if (muscleSetsChartInstance) muscleSetsChartInstance.destroy();
+            muscleSetsChartInstance = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            display: isAsymmetric,
+                            labels: { color: '#9ca3af', font: { size: 10, family: 'Inter' }, boxWidth: 12 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (item) => `${item.dataset.label}: ${item.parsed.y} sets`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#6b7280', font: { size: 10, family: 'JetBrains Mono' }, maxRotation: 45 },
+                            grid: { color: 'rgba(31, 41, 55, 0.5)' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: `Sets / ${unitWord}`, color: '#6b7280', font: { size: 10, family: 'Inter' } },
+                            ticks: { color: '#10b981', font: { size: 10, family: 'JetBrains Mono' } },
+                            grid: { color: 'rgba(31, 41, 55, 0.6)' }
+                        }
+                    }
+                }
+            });
         }
 
         function renderExerciseMuscleConfigTable() {
@@ -2829,12 +3105,8 @@
         function populateExerciseSelect() {
             const filterCat = document.getElementById('category-filter')?.value || 'ALL';
             const logSelect = document.getElementById('log-exercise');
-            const analyticsSelect = document.getElementById('analytics-exercise-select');
-            const recoveryExSelect = document.getElementById('recovery-exercise-filter');
 
             const currentLogSelection = logSelect?.value;
-            const currentAnalyticsSelection = analyticsSelect?.value;
-            const currentRecoveryExSelection = recoveryExSelect?.value;
 
             const filtered = filterCat === 'ALL'
                 ? exercises
@@ -2851,24 +3123,98 @@
                 }
             }
 
-            const globalAndLiftsHtml = [
-                `<option value="__ALL__">All Exercises (Global Overview)</option>`,
-                ...exercises.map(e => `<option value="${escapeHtml(e.name)}">${escapeHtml(e.name)}</option>`)
-            ].join('');
+            renderScopeDropdown('analytics');
+            renderScopeDropdown('recovery');
+        }
 
-            if (analyticsSelect) {
-                analyticsSelect.innerHTML = globalAndLiftsHtml;
-                if (currentAnalyticsSelection && (currentAnalyticsSelection === '__ALL__' || exercises.some(e => e.name === currentAnalyticsSelection))) {
-                    analyticsSelect.value = currentAnalyticsSelection;
+        /**************************************************************
+         * 4B. TRAINING SCOPE MULTI-SELECT DROPDOWNS (VOL & PRs / RECOVERY)
+         **************************************************************/
+        function getScopeExerciseNames() {
+            const names = exercises.map(e => e.name);
+            const known = new Set(names);
+            workoutLogs.forEach(s => {
+                if (s.exercise && !known.has(s.exercise)) {
+                    known.add(s.exercise);
+                    names.push(s.exercise);
                 }
+            });
+            return names;
+        }
+
+        // selectedEx keeps the original meaning: a single exercise name, or '__ALL__' for multi-lift (avg % gain) mode
+        function getScopeState(scopeKey) {
+            const all = getScopeExerciseNames();
+            const excluded = scopeExcluded[scopeKey];
+            const selected = all.filter(n => !excluded.has(n));
+            return {
+                all,
+                selected,
+                isAll: selected.length === all.length,
+                selectedEx: selected.length === 1 ? selected[0] : '__ALL__',
+                includes: (name) => !excluded.has(name)
+            };
+        }
+
+        function renderScopeDropdown(scopeKey) {
+            const labelEl = document.getElementById(`${scopeKey}-scope-label`);
+            const listEl = document.getElementById(`${scopeKey}-scope-list`);
+            const scope = getScopeState(scopeKey);
+
+            if (labelEl) {
+                if (scope.all.length === 0) labelEl.textContent = 'No exercises yet';
+                else if (scope.isAll) labelEl.textContent = `All exercises (${scope.all.length})`;
+                else if (scope.selected.length === 0) labelEl.textContent = 'No exercises selected';
+                else if (scope.selected.length === 1) labelEl.textContent = scope.selected[0];
+                else labelEl.textContent = `${scope.selected.length} of ${scope.all.length} exercises`;
             }
 
-            if (recoveryExSelect) {
-                recoveryExSelect.innerHTML = globalAndLiftsHtml;
-                if (currentRecoveryExSelection && (currentRecoveryExSelection === '__ALL__' || exercises.some(e => e.name === currentRecoveryExSelection))) {
-                    recoveryExSelect.value = currentRecoveryExSelection;
-                }
+            if (listEl) {
+                listEl.innerHTML = scope.all.map((name, idx) => `
+                    <label class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-800 cursor-pointer">
+                        <input type="checkbox" ${scope.includes(name) ? 'checked' : ''} onchange="toggleScopeExercise('${scopeKey}', ${idx}, this.checked)" class="accent-emerald-500 w-3.5 h-3.5 shrink-0">
+                        <span class="flex-1 min-w-0 truncate text-xs font-semibold text-gray-200">${escapeHtml(name)}</span>
+                        <button type="button" onclick="event.preventDefault(); event.stopPropagation(); setScopeOnly('${scopeKey}', ${idx})" class="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold text-gray-500 hover:text-brand-400 transition">Only</button>
+                    </label>
+                `).join('') || '<p class="text-[11px] text-gray-500 px-2 py-1.5">Log a set to see exercises here.</p>';
             }
+        }
+
+        function rerenderScopeOwner(scopeKey) {
+            renderScopeDropdown(scopeKey);
+            if (scopeKey === 'analytics') renderAnalytics();
+            if (scopeKey === 'recovery') renderRecoveryPage();
+        }
+
+        function toggleScopePanel(scopeKey) {
+            const panel = document.getElementById(`${scopeKey}-scope-panel`);
+            if (!panel) return;
+            const willOpen = panel.classList.contains('hidden');
+            if (willOpen) renderScopeDropdown(scopeKey);
+            panel.classList.toggle('hidden', !willOpen);
+        }
+
+        function toggleScopeExercise(scopeKey, idx, checked) {
+            const name = getScopeExerciseNames()[idx];
+            if (name === undefined) return;
+            if (checked) scopeExcluded[scopeKey].delete(name);
+            else scopeExcluded[scopeKey].add(name);
+            rerenderScopeOwner(scopeKey);
+        }
+
+        function setScopeAll(scopeKey, selectAll) {
+            scopeExcluded[scopeKey].clear();
+            if (!selectAll) getScopeExerciseNames().forEach(n => scopeExcluded[scopeKey].add(n));
+            rerenderScopeOwner(scopeKey);
+        }
+
+        function setScopeOnly(scopeKey, idx) {
+            const names = getScopeExerciseNames();
+            const keep = names[idx];
+            if (keep === undefined) return;
+            scopeExcluded[scopeKey].clear();
+            names.forEach(n => { if (n !== keep) scopeExcluded[scopeKey].add(n); });
+            rerenderScopeOwner(scopeKey);
         }
 
         function getExerciseRecords(exerciseName) {
@@ -3296,7 +3642,10 @@
             const endStr = formatLocalDate(today);
             let startStr = '';
 
-            if (preset === '12w') {
+            if (preset === '4w') {
+                const start = new Date(today.getTime() - 28 * 86400000);
+                startStr = formatLocalDate(start);
+            } else if (preset === '12w') {
                 const start = new Date(today.getTime() - 84 * 86400000);
                 startStr = formatLocalDate(start);
             } else if (preset === '12m') {
@@ -3331,7 +3680,7 @@
         }
 
         function updateAnalyticsDatePresetButtonsUI() {
-            ['12w', '12m', 'all'].forEach(p => {
+            ['4w', '12w', '12m', 'all'].forEach(p => {
                 const btn = document.getElementById(`range-btn-${p}`);
                 if (!btn) return;
                 if (analyticsDatePreset === p) {
@@ -3344,13 +3693,31 @@
 
         function setAnalyticsInterval(interval) {
             analyticsInterval = interval;
-            document.getElementById('interval-btn-weekly').className = interval === 'weekly'
-                ? 'px-3 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition'
-                : 'px-3 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition';
-            document.getElementById('interval-btn-monthly').className = interval === 'monthly'
-                ? 'px-3 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition'
-                : 'px-3 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition';
+            ['daily', 'weekly', 'monthly'].forEach(i => {
+                const btn = document.getElementById(`interval-btn-${i}`);
+                if (!btn) return;
+                btn.className = analyticsInterval === i ? 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition' : 'px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition';
+            });
             renderAnalytics();
+        }
+
+        function setAnalyticsVolumeMetric(metric) {
+            analyticsVolumeMetric = metric;
+            ['tonnage', 'e1rm'].forEach(m => {
+                const btn = document.getElementById(`volmetric-btn-${m}`);
+                if (!btn) return;
+                btn.className = analyticsVolumeMetric === m ? 'px-2.5 py-1 rounded-lg text-[11px] font-bold bg-brand-500 text-surface-950 transition' : 'px-2.5 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-white transition';
+            });
+            renderAnalytics();
+        }
+
+        function getIntervalAdjective(intervalType) {
+            return { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly' }[intervalType] || 'Weekly';
+        }
+
+        function getAnalyticsVolumeSeriesLabel() {
+            const adj = getIntervalAdjective(analyticsInterval);
+            return analyticsVolumeMetric === 'e1rm' ? `${adj} Training Volume (1RM)` : `${adj} Volume (kg)`;
         }
 
         function setChartMode(mode) {
@@ -3371,6 +3738,9 @@
         }
 
         function getIntervalBucketKey(dateStr, intervalType) {
+            if (intervalType === 'daily') {
+                return dateStr; // YYYY-MM-DD
+            }
             if (intervalType === 'monthly') {
                 return dateStr.slice(0, 7); // YYYY-MM
             }
@@ -3394,16 +3764,16 @@
                 }
             }
 
-            const selectedEx = document.getElementById('analytics-exercise-select')?.value || '__ALL__';
+            const analyticsScope = getScopeState('analytics');
+            renderScopeDropdown('analytics');
+            const selectedEx = analyticsScope.selectedEx;
             const startStr = document.getElementById('analytics-start-date')?.value || '1970-01-01';
             const endStr = document.getElementById('analytics-end-date')?.value || getLocalTodayDateString();
             const rangeStart = startStr <= endStr ? startStr : endStr;
             const rangeEnd = endStr >= startStr ? endStr : startStr;
 
             const logsInRange = workoutLogs.filter(s => s.date >= rangeStart && s.date <= rangeEnd);
-            const filteredLogs = selectedEx === '__ALL__'
-                ? logsInRange
-                : logsInRange.filter(s => s.exercise === selectedEx);
+            const filteredLogs = logsInRange.filter(s => analyticsScope.includes(s.exercise));
 
             const bwInRange = bodyweightLogs
                 .filter(b => b.date >= rangeStart && b.date <= rangeEnd)
@@ -3427,9 +3797,10 @@
             filteredLogs.forEach(s => {
                 const bKey = getIntervalBucketKey(s.date, analyticsInterval);
                 if (!bucketsMap[bKey]) {
-                    bucketsMap[bKey] = { volume: 0, sets: 0, max1RMByEx: {}, best1RM: 0, maxWeight: 0 };
+                    bucketsMap[bKey] = { volume: 0, volume1rm: 0, sets: 0, max1RMByEx: {}, best1RM: 0, maxWeight: 0 };
                 }
                 bucketsMap[bKey].volume += s.volume || 0;
+                bucketsMap[bKey].volume1rm += s.e1rm || 0;
                 bucketsMap[bKey].sets += 1;
                 if (s.e1rm > bucketsMap[bKey].best1RM) bucketsMap[bKey].best1RM = s.e1rm;
                 if (s.weight > bucketsMap[bKey].maxWeight) bucketsMap[bKey].maxWeight = s.weight;
@@ -3441,7 +3812,7 @@
             bwInRange.forEach(b => {
                 const bKey = getIntervalBucketKey(b.date, analyticsInterval);
                 if (!bucketsMap[bKey]) {
-                    bucketsMap[bKey] = { volume: 0, sets: 0, max1RMByEx: {}, best1RM: 0, maxWeight: 0 };
+                    bucketsMap[bKey] = { volume: 0, volume1rm: 0, sets: 0, max1RMByEx: {}, best1RM: 0, maxWeight: 0 };
                 }
                 bucketsMap[bKey].bw = b.weight;
             });
@@ -3477,7 +3848,7 @@
             sortedKeys.forEach(k => {
                 const bucket = bucketsMap[k];
                 labels.push(analyticsInterval === 'monthly' ? k : k.slice(5));
-                volumeData.push(Math.round(bucket.volume));
+                volumeData.push(Math.round(analyticsVolumeMetric === 'e1rm' ? bucket.volume1rm : bucket.volume));
 
                 if (bucket.bw) lastKnownBw = bucket.bw;
                 bwKgData.push(lastKnownBw ? +lastKnownBw.toFixed(1) : null);
@@ -3501,7 +3872,9 @@
             });
 
             const peakIntervalVol = volumeData.length > 0 ? Math.max(...volumeData) : 0;
-            const totalTonnage = filteredLogs.reduce((sum, s) => sum + (s.volume || 0), 0);
+            const totalTonnage = analyticsVolumeMetric === 'e1rm'
+                ? filteredLogs.reduce((sum, s) => sum + (s.e1rm || 0), 0)
+                : filteredLogs.reduce((sum, s) => sum + (s.volume || 0), 0);
 
             if (selectedEx === '__ALL__') {
                 document.getElementById('stat-card1-label').textContent = 'Active Lifts';
@@ -3529,7 +3902,10 @@
             }
 
             document.getElementById('stat-max-vol').textContent = peakIntervalVol > 0 ? `${peakIntervalVol.toLocaleString()} kg` : '—';
-            document.getElementById('stat-max-vol-sub').textContent = `Best ${analyticsInterval === 'monthly' ? 'month' : 'week'}`;
+            const isE1rmVolume = analyticsVolumeMetric === 'e1rm';
+            document.getElementById('stat-card3-label').textContent = isE1rmVolume ? 'Peak Interval Vol (1RM)' : 'Peak Interval Vol';
+            document.getElementById('stat-card4-label').textContent = isE1rmVolume ? 'Training Volume (1RM)' : 'Total Tonnage';
+            document.getElementById('stat-max-vol-sub').textContent = `Best ${{ daily: 'day', weekly: 'week', monthly: 'month' }[analyticsInterval] || 'week'}`;
             document.getElementById('stat-cum-vol').textContent = totalTonnage > 0 ? `${Math.round(totalTonnage).toLocaleString()} kg` : '—';
             document.getElementById('stat-cum-sets').textContent = `${filteredLogs.length} total sets`;
 
@@ -3561,7 +3937,7 @@
                 });
                 datasets.push({
                     type: 'bar',
-                    label: `${analyticsInterval === 'monthly' ? 'Monthly' : 'Weekly'} Volume (kg)`,
+                    label: getAnalyticsVolumeSeriesLabel(),
                     data: volumeData,
                     backgroundColor: 'rgba(56, 189, 248, 0.28)',
                     borderColor: 'rgba(56, 189, 248, 0.7)',
@@ -3597,7 +3973,7 @@
             } else if (currentChartMode === 'volume') {
                 datasets.push({
                     type: 'bar',
-                    label: `${analyticsInterval === 'monthly' ? 'Monthly' : 'Weekly'} Volume (kg)`,
+                    label: getAnalyticsVolumeSeriesLabel(),
                     data: volumeData,
                     backgroundColor: 'rgba(16, 185, 129, 0.35)',
                     borderColor: '#10b981',
@@ -3670,12 +4046,10 @@
         }
 
         function inspectExerciseFromLeaderboard(exName) {
-            const sel = document.getElementById('analytics-exercise-select');
-            if (sel) {
-                sel.value = exName;
-                renderAnalytics();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+            scopeExcluded.analytics.clear();
+            getScopeExerciseNames().forEach(n => { if (n !== exName) scopeExcluded.analytics.add(n); });
+            renderAnalytics();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         /**************************************************************
@@ -3717,11 +4091,25 @@
                 bg: 'rgba(251, 146, 60, 0.22)',
                 defaultChartType: 'bar'
             },
+            stress: {
+                label: 'Avg Stress Level (0–100)',
+                unit: '',
+                color: '#facc15',
+                bg: 'rgba(250, 204, 21, 0.18)',
+                defaultChartType: 'line'
+            },
             volume: {
                 label: 'Training Volume (kg)',
                 unit: 'kg',
                 color: '#38bdf8',
                 bg: 'rgba(56, 189, 248, 0.25)',
+                defaultChartType: 'bar'
+            },
+            volume1rm: {
+                label: 'Training Volume (1RM)',
+                unit: 'kg',
+                color: '#a78bfa',
+                bg: 'rgba(167, 139, 250, 0.25)',
                 defaultChartType: 'bar'
             },
             sets: {
@@ -3837,6 +4225,7 @@
             const rhrEl = document.getElementById('rec-input-rhr');
             const stepsEl = document.getElementById('rec-input-steps');
             const calEl = document.getElementById('rec-input-cal');
+            const stressEl = document.getElementById('rec-input-stress');
 
             if (existing) {
                 if (sleepEl) sleepEl.value = existing.sleepHours ?? '';
@@ -3844,12 +4233,14 @@
                 if (rhrEl) rhrEl.value = existing.restingHR ?? '';
                 if (stepsEl) stepsEl.value = existing.steps ?? '';
                 if (calEl) calEl.value = existing.activeCalories ?? '';
+                if (stressEl) stressEl.value = existing.stress ?? '';
             } else {
                 if (sleepEl) sleepEl.value = '';
                 if (hrvEl) hrvEl.value = '';
                 if (rhrEl) rhrEl.value = '';
                 if (stepsEl) stepsEl.value = '';
                 if (calEl) calEl.value = '';
+                if (stressEl) stressEl.value = '';
             }
         }
 
@@ -3860,14 +4251,16 @@
             const rawRhr = document.getElementById('rec-input-rhr')?.value;
             const rawSteps = document.getElementById('rec-input-steps')?.value;
             const rawCal = document.getElementById('rec-input-cal')?.value;
+            const rawStress = document.getElementById('rec-input-stress')?.value;
 
             const sleepHours = rawSleep !== '' && !isNaN(parseFloat(rawSleep)) ? +parseFloat(rawSleep).toFixed(2) : null;
             const hrv = rawHrv !== '' && !isNaN(parseFloat(rawHrv)) ? +parseFloat(rawHrv).toFixed(1) : null;
             const restingHR = rawRhr !== '' && !isNaN(parseFloat(rawRhr)) ? +parseFloat(rawRhr).toFixed(1) : null;
             const steps = rawSteps !== '' && !isNaN(parseFloat(rawSteps)) ? Math.round(parseFloat(rawSteps)) : null;
             const activeCalories = rawCal !== '' && !isNaN(parseFloat(rawCal)) ? Math.round(parseFloat(rawCal)) : null;
+            const stress = rawStress !== '' && !isNaN(parseFloat(rawStress)) ? Math.min(100, Math.max(0, Math.round(parseFloat(rawStress)))) : null;
 
-            if (sleepHours === null && hrv === null && restingHR === null && steps === null && activeCalories === null) {
+            if (sleepHours === null && hrv === null && restingHR === null && steps === null && activeCalories === null && stress === null) {
                 showToast('Enter at least one health or recovery value', true);
                 return;
             }
@@ -3879,6 +4272,7 @@
                 if (restingHR !== null) recoveryLogs[existingIdx].restingHR = restingHR;
                 if (steps !== null) recoveryLogs[existingIdx].steps = steps;
                 if (activeCalories !== null) recoveryLogs[existingIdx].activeCalories = activeCalories;
+                if (stress !== null) recoveryLogs[existingIdx].stress = stress;
                 recoveryLogs[existingIdx].timestamp = Date.now();
             } else {
                 recoveryLogs.push({
@@ -3889,7 +4283,8 @@
                     hrv,
                     restingHR,
                     steps,
-                    activeCalories
+                    activeCalories,
+                    stress
                 });
             }
 
@@ -3919,9 +4314,11 @@
 
             const metricA = document.getElementById('recovery-metric-a')?.value || 'hrv';
             const metricB = document.getElementById('recovery-metric-b')?.value || 'volume';
-            const selectedEx = document.getElementById('recovery-exercise-filter')?.value || '__ALL__';
+            const recoveryScope = getScopeState('recovery');
+            renderScopeDropdown('recovery');
+            const selectedEx = recoveryScope.selectedEx;
 
-            const trainingMetrics = ['volume', 'sets', 'progressionPct'];
+            const trainingMetrics = ['volume', 'volume1rm', 'sets', 'progressionPct'];
             const filterRow = document.getElementById('recovery-lift-filter-row');
             if (filterRow) {
                 if (trainingMetrics.includes(metricA) || trainingMetrics.includes(metricB)) {
@@ -3938,12 +4335,14 @@
             const rhrVals = recInRange.map(r => r.restingHR).filter(v => v !== null && v !== undefined && v > 0);
             const stepsVals = recInRange.map(r => r.steps).filter(v => v !== null && v !== undefined && v >= 0);
             const calVals = recInRange.map(r => r.activeCalories).filter(v => v !== null && v !== undefined && v >= 0);
+            const stressVals = recInRange.map(r => r.stress).filter(v => v !== null && v !== undefined && v > 0);
 
             const avgSleep = sleepVals.length > 0 ? (sleepVals.reduce((a, b) => a + b, 0) / sleepVals.length).toFixed(2) : null;
             const avgHrv = hrvVals.length > 0 ? Math.round(hrvVals.reduce((a, b) => a + b, 0) / hrvVals.length) : null;
             const avgRhr = rhrVals.length > 0 ? (rhrVals.reduce((a, b) => a + b, 0) / rhrVals.length).toFixed(1) : null;
             const avgSteps = stepsVals.length > 0 ? Math.round(stepsVals.reduce((a, b) => a + b, 0) / stepsVals.length) : null;
             const avgCal = calVals.length > 0 ? Math.round(calVals.reduce((a, b) => a + b, 0) / calVals.length) : null;
+            const avgStress = stressVals.length > 0 ? Math.round(stressVals.reduce((a, b) => a + b, 0) / stressVals.length) : null;
 
             document.getElementById('rec-stat-sleep').textContent = avgSleep ? `${avgSleep} hrs` : '—';
             document.getElementById('rec-stat-sleep-sub').textContent = `${sleepVals.length} days`;
@@ -3962,11 +4361,14 @@
             if (calStatEl) calStatEl.textContent = avgCal !== null ? `${avgCal.toLocaleString()} kcal` : '—';
             if (calSubEl) calSubEl.textContent = `${calVals.length} days`;
 
+            const stressStatEl = document.getElementById('rec-stat-stress');
+            const stressSubEl = document.getElementById('rec-stat-stress-sub');
+            if (stressStatEl) stressStatEl.textContent = avgStress !== null ? `${avgStress} / 100` : '—';
+            if (stressSubEl) stressSubEl.textContent = `${stressVals.length} days`;
+
             // Aggregate workout, bodyweight, and recovery data into buckets
             const logsInRange = workoutLogs.filter(s => s.date >= rangeStart && s.date <= rangeEnd);
-            const filteredWorkouts = selectedEx === '__ALL__'
-                ? logsInRange
-                : logsInRange.filter(s => s.exercise === selectedEx);
+            const filteredWorkouts = logsInRange.filter(s => recoveryScope.includes(s.exercise));
             const bwInRange = bodyweightLogs
                 .filter(b => b.date >= rangeStart && b.date <= rangeEnd)
                 .sort((a, b) => a.date.localeCompare(b.date));
@@ -3976,6 +4378,7 @@
                 if (!bucketsMap[bKey]) {
                     bucketsMap[bKey] = {
                         volume: 0,
+                        volume1rm: 0,
                         sets: 0,
                         max1RMByEx: {},
                         best1RM: 0,
@@ -3984,6 +4387,7 @@
                         rhrList: [],
                         stepsList: [],
                         calList: [],
+                        stressList: [],
                         bwList: []
                     };
                 }
@@ -3993,6 +4397,7 @@
             filteredWorkouts.forEach(s => {
                 const b = ensureBucket(getRecoveryBucketKey(s.date, recoveryInterval));
                 b.volume += s.volume || 0;
+                b.volume1rm += s.e1rm || 0;
                 b.sets += 1;
                 if (s.e1rm > b.best1RM) b.best1RM = s.e1rm;
                 if (!b.max1RMByEx[s.exercise] || s.e1rm > b.max1RMByEx[s.exercise]) {
@@ -4007,6 +4412,7 @@
                 if (r.restingHR !== null && r.restingHR !== undefined && r.restingHR > 0) b.rhrList.push(r.restingHR);
                 if (r.steps !== null && r.steps !== undefined && r.steps >= 0) b.stepsList.push(r.steps);
                 if (r.activeCalories !== null && r.activeCalories !== undefined && r.activeCalories >= 0) b.calList.push(r.activeCalories);
+                if (r.stress !== null && r.stress !== undefined && r.stress > 0) b.stressList.push(r.stress);
             });
 
             bwInRange.forEach(bw => {
@@ -4043,7 +4449,9 @@
                 restingHR: [],
                 steps: [],
                 activeCalories: [],
+                stress: [],
                 volume: [],
+                volume1rm: [],
                 sets: [],
                 progressionPct: [],
                 bodyweight: [],
@@ -4063,7 +4471,9 @@
                 seriesByMetric.restingHR.push(avgArr(b.rhrList, 1));
                 seriesByMetric.steps.push(avgArr(b.stepsList, 0));
                 seriesByMetric.activeCalories.push(avgArr(b.calList, 0));
+                seriesByMetric.stress.push(avgArr(b.stressList, 0));
                 seriesByMetric.volume.push(b.volume > 0 ? Math.round(b.volume) : 0);
+                seriesByMetric.volume1rm.push(b.volume1rm > 0 ? Math.round(b.volume1rm) : 0);
                 seriesByMetric.sets.push(b.sets);
 
                 if (b.bwList.length > 0) {
@@ -4465,6 +4875,7 @@
                     const rhrVal = +(54 - progressRatio * 3 - (isDeload ? 1.5 : (isTrainingDay ? -0.8 : 0.5)) - Math.sin(w * 0.5 + d) * 1.8).toFixed(1);
                     const stepsVal = Math.round(8200 + (isTrainingDay ? 1400 : -600) + Math.sin(w * 0.9 + d * 1.3) * 1800);
                     const activeCalVal = Math.round(420 + (isTrainingDay ? 340 : 0) - (isDeload ? 90 : 0) + Math.cos(w * 0.6 + d) * 85);
+                    const stressDemoVal = Math.round(30 + (isTrainingDay ? 4 : -3) - (isDeload ? 5 : 0) - (sleepHrs - 7.3) * 6 + Math.sin(w * 0.8 + d * 1.1) * 7);
 
                     demoRec.push({
                         id: `demo_rec_${w}_${d}`,
@@ -4474,7 +4885,8 @@
                         hrv: hrvVal,
                         restingHR: rhrVal,
                         steps: stepsVal,
-                        activeCalories: activeCalVal
+                        activeCalories: activeCalVal,
+                        stress: stressDemoVal
                     });
                 }
 
