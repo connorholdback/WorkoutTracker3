@@ -114,6 +114,7 @@ def extract_sleep_and_hrv_for_date(client: Garmin, date_str: str) -> dict:
     hrv_ms = None
     steps_count = None
     active_kcal = None
+    stress_avg = None
 
     # 1. Fetch Sleep Duration & Resting HR from Garmin Sleep Data
     try:
@@ -165,15 +166,31 @@ def extract_sleep_and_hrv_for_date(client: Garmin, date_str: str) -> dict:
         raw_active_kcal = user_summary.get("activeKilocalories")
         if raw_active_kcal is not None and float(raw_active_kcal) >= 0:
             active_kcal = int(round(float(raw_active_kcal)))
+
+        # Garmin reports -1 / -2 when there wasn't enough data for a stress score
+        raw_stress = user_summary.get("averageStressLevel")
+        if raw_stress is not None and float(raw_stress) > 0:
+            stress_avg = int(round(float(raw_stress)))
     except Exception:
         pass
+
+    # 5. Fallback for Average Stress Level via the dedicated stress endpoint
+    if stress_avg is None:
+        try:
+            stress_data = client.get_stress_data(date_str) or {}
+            raw_stress = stress_data.get("avgStressLevel")
+            if raw_stress is not None and float(raw_stress) > 0:
+                stress_avg = int(round(float(raw_stress)))
+        except Exception:
+            pass
 
     return {
         "sleepHours": sleep_hours,
         "restingHR": resting_hr,
         "hrv": hrv_ms,
         "steps": steps_count,
-        "activeCalories": active_kcal
+        "activeCalories": active_kcal,
+        "stress": stress_avg
     }
 
 
@@ -332,13 +349,13 @@ def main():
     except Exception as e:
         print(f"Warning: Could not fetch body composition ({e})")
 
-    print(f"Fetching Garmin sleep, resting HR, HRV, steps & active calories from {start_date.isoformat()} to {end_date.isoformat()}...")
+    print(f"Fetching Garmin sleep, resting HR, HRV, steps, active calories & stress from {start_date.isoformat()} to {end_date.isoformat()}...")
     cur_date = start_date
     recovery_days_count = 0
     while cur_date <= end_date:
         d_str = cur_date.isoformat()
         metrics = extract_sleep_and_hrv_for_date(client, d_str)
-        if any(metrics[k] is not None for k in ("sleepHours", "restingHR", "hrv", "steps", "activeCalories")):
+        if any(metrics[k] is not None for k in ("sleepHours", "restingHR", "hrv", "steps", "activeCalories", "stress")):
             existing_rec = recovery_by_date.get(d_str, {})
             recovery_by_date[d_str] = {
                 "id": f"garmin_rec_{d_str}",
@@ -348,7 +365,8 @@ def main():
                 "restingHR": metrics["restingHR"] if metrics["restingHR"] is not None else existing_rec.get("restingHR"),
                 "hrv": metrics["hrv"] if metrics["hrv"] is not None else existing_rec.get("hrv"),
                 "steps": metrics["steps"] if metrics["steps"] is not None else existing_rec.get("steps"),
-                "activeCalories": metrics["activeCalories"] if metrics["activeCalories"] is not None else existing_rec.get("activeCalories")
+                "activeCalories": metrics["activeCalories"] if metrics["activeCalories"] is not None else existing_rec.get("activeCalories"),
+                "stress": metrics["stress"] if metrics["stress"] is not None else existing_rec.get("stress")
             }
             recovery_days_count += 1
         cur_date += timedelta(days=1)
